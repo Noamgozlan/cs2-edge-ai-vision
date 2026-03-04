@@ -18,6 +18,7 @@ import MatchDetail from "./pages/MatchDetail";
 import Predictions from "./pages/Predictions";
 import OddsComparison from "./pages/OddsComparison";
 import DashboardSettings from "./pages/DashboardSettings";
+import DemoBetting from "./pages/DemoBetting";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
                 <Route path="match/:id" element={<MatchDetail />} />
                 <Route path="predictions" element={<Predictions />} />
                 <Route path="odds" element={<OddsComparison />} />
+                <Route path="demo-betting" element={<DemoBetting />} />
                 <Route path="settings" element={<DashboardSettings />} />
               </Route>
               <Route path="*" element={<NotFound />} />
