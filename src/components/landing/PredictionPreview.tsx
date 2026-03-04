@@ -1,117 +1,147 @@
 import { motion } from "framer-motion";
 import { TeamLogo } from "@/lib/team-logos";
+import { Zap, TrendingUp, Shield, Database } from "lucide-react";
 
 const PredictionPreview = () => (
-  <section id="predictions" className="py-32 bg-card overflow-hidden relative">
-    <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_right,_hsl(var(--primary)/0.05)_0%,_transparent_60%)] pointer-events-none" />
+  <section id="predictions" className="py-28 bg-card/50 overflow-hidden relative">
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(var(--primary)/0.04)_0%,_transparent_60%)] pointer-events-none" />
 
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-12">
+    <div className="max-w-screen-xl mx-auto px-6 lg:px-12">
       {/* Header */}
       <div className="text-center mb-16">
-        <h2 className="text-destructive text-[11px] font-black uppercase tracking-[0.5em] mb-4">
-          Live Analysis Feed
-        </h2>
-        <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic">
-          Live Broadcast Overlay
-        </h3>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="inline-block text-[11px] font-bold text-accent uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full border border-accent/20 bg-accent/5">
+            Live Preview
+          </span>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+            See the AI in <span className="text-primary">Action</span>
+          </h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Real analysis output from our neural engine — updated in real-time with live HLTV data.
+          </p>
+        </motion.div>
       </div>
 
-      {/* Broadcast Panel */}
+      {/* Preview card */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="relative"
+        className="max-w-4xl mx-auto"
       >
-        <div className="relative z-10 rounded-xl overflow-hidden border border-border bg-card/80 backdrop-blur-xl shadow-2xl">
-          <div className="flex flex-col xl:flex-row">
-            {/* Left: Map View Placeholder */}
-            <div className="xl:w-2/5 relative min-h-[300px] md:min-h-[400px] bg-muted/30">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(var(--primary)/0.05)_0%,_transparent_70%)]" />
-              <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
-              {/* Live badge */}
-              <div className="absolute top-8 left-8">
-                <div className="flex items-center gap-3 bg-destructive px-4 py-1.5 rounded-sm text-[10px] font-black tracking-widest uppercase italic text-destructive-foreground">
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  Live Feed // Analysis Active
+        <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                <div className="w-3 h-3 rounded-full bg-accent/40" />
+                <div className="w-3 h-3 rounded-full bg-primary/40" />
+              </div>
+              <span className="text-[11px] font-bold text-muted-foreground">CS2 Edge AI — Match Analysis</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Database className="w-3.5 h-3.5 text-accent" />
+              <span className="text-[10px] font-bold text-accent">LIVE DATA</span>
+            </div>
+          </div>
+
+          <div className="p-6 md:p-10">
+            {/* Match header */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <TeamLogo name="G2 Esports" size={44} />
+                <div>
+                  <p className="font-bold text-lg">G2 Esports</p>
+                  <p className="text-xs text-muted-foreground">World #3</p>
                 </div>
               </div>
-              {/* Faux map grid */}
-              <div className="absolute inset-0 opacity-[0.03]" style={{
-                backgroundImage: "repeating-linear-gradient(0deg, hsl(var(--foreground)) 0px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, hsl(var(--foreground)) 0px, transparent 1px, transparent 40px)",
-              }} />
+              <div className="text-center">
+                <p className="text-2xl font-black text-muted-foreground/30">VS</p>
+                <p className="text-[10px] text-muted-foreground mt-1">IEM Katowice • Bo3</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="font-bold text-lg">FaZe Clan</p>
+                  <p className="text-xs text-muted-foreground">World #4</p>
+                </div>
+                <TeamLogo name="FaZe Clan" size={44} />
+              </div>
             </div>
 
-            {/* Right: Analysis */}
-            <div className="xl:w-3/5 p-8 md:p-16 flex flex-col justify-center">
-              <div className="flex items-center gap-4 mb-8 text-muted-foreground font-bold text-[11px] tracking-widest uppercase">
-                <span>ESL Pro League Season 19</span>
-                <span className="text-primary">•</span>
-                <span>Grand Final • Map 3 (Anubis)</span>
+            {/* Smart bet card */}
+            <div className="rounded-xl p-5 mb-6" style={{
+              background: "linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--accent) / 0.05) 100%)",
+              border: "1px solid hsl(var(--primary) / 0.2)",
+            }}>
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-4 h-4 text-primary" />
+                <span className="text-[10px] font-black text-primary uppercase tracking-widest">AI Smart Bet — Both Win Map</span>
               </div>
-
-              {/* VS */}
-              <div className="flex items-center justify-between mb-14">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-20 h-20 md:w-24 md:h-24 bg-muted/50 border border-border rounded-full flex items-center justify-center p-4">
-                    <TeamLogo name="M80" size={56} />
-                  </div>
-                  <span className="text-xl md:text-2xl font-black uppercase italic tracking-tighter">M80</span>
-                </div>
-                <span className="text-muted-foreground/20 text-5xl md:text-6xl font-black italic select-none">VS</span>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-20 h-20 md:w-24 md:h-24 bg-primary/10 border border-primary rounded-full flex items-center justify-center p-4 shadow-[0_0_30px_hsl(var(--primary)/0.2)]">
-                    <TeamLogo name="Team Liquid" size={56} />
-                  </div>
-                  <span className="text-xl md:text-2xl font-black uppercase italic tracking-tighter text-primary">Liquid</span>
-                </div>
+              <p className="text-xl font-black mb-3">Both Teams to Win a Map (Yes) @ 1.88</p>
+              <div className="flex items-center gap-6">
+                <span className="text-sm font-bold text-primary">84% confidence</span>
+                <span className="text-sm font-bold text-accent">EV: +16.2%</span>
               </div>
+            </div>
 
-              {/* Broadcast Overlay */}
-              <div className="rounded-lg bg-primary/5 border-l-4 border-primary p-6 md:p-8 mb-10">
-                <div className="flex justify-between items-end mb-6">
-                  <div>
-                    <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-1">Win Probability</p>
-                    <h4 className="text-3xl md:text-4xl font-black italic uppercase">Liquid Leads</h4>
-                  </div>
-                  <span className="text-4xl md:text-5xl font-black text-primary italic">72%</span>
+            {/* Probability + Veto side by side */}
+            <div className="grid md:grid-cols-2 gap-5">
+              {/* Win probability */}
+              <div className="rounded-xl border border-border p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-bold">Win Probability</span>
                 </div>
-
-                <div className="w-full h-3 bg-muted rounded-full overflow-hidden flex mb-6">
+                <div className="flex justify-between text-sm font-bold mb-2">
+                  <span>G2 — 52%</span>
+                  <span className="text-primary">FaZe — 48%</span>
+                </div>
+                <div className="w-full h-3 rounded-full bg-muted overflow-hidden flex">
                   <motion.div
-                    className="h-full bg-muted-foreground/40"
+                    className="h-full bg-primary rounded-l-full"
                     initial={{ width: 0 }}
-                    whileInView={{ width: "28%" }}
+                    whileInView={{ width: "52%" }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    transition={{ duration: 0.8 }}
                   />
                   <motion.div
-                    className="h-full bg-primary shadow-[0_0_15px_hsl(var(--primary)/0.8)]"
+                    className="h-full bg-muted-foreground/30 rounded-r-full"
                     initial={{ width: 0 }}
-                    whileInView={{ width: "72%" }}
+                    whileInView={{ width: "48%" }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+                    transition={{ duration: 0.8, delay: 0.1 }}
                   />
                 </div>
-
-                <div className="flex items-center justify-between border-t border-border pt-6">
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <p className="text-muted-foreground text-[9px] font-bold uppercase mb-1">Confidence</p>
-                      <p className="text-primary font-black italic text-lg tracking-tight">HIGH (8.4/10)</p>
-                    </div>
-                    <div className="h-10 w-px bg-border" />
-                    <div>
-                      <p className="text-muted-foreground text-[9px] font-bold uppercase mb-1">Calculated EV</p>
-                      <p className="text-accent font-black italic text-lg tracking-tight">+14.2%</p>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-[10px] text-muted-foreground mt-3">
+                  m0NESY predicted 39+ kills — top fragger prop @ 1.83
+                </p>
               </div>
 
-              <button className="w-full bg-foreground text-background py-5 rounded-sm font-black text-sm uppercase tracking-[0.2em] hover:bg-primary hover:text-primary-foreground transition-all flex items-center justify-center gap-3">
-                🔓 Unlock Premium Tactical Briefing
-              </button>
+              {/* Veto preview */}
+              <div className="rounded-xl border border-border p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-bold">Predicted Veto</span>
+                </div>
+                <div className="space-y-2">
+                  {[
+                    { action: "ban", team: "G2", map: "Vertigo", color: "text-destructive bg-destructive/8 border-destructive/15" },
+                    { action: "ban", team: "FaZe", map: "Anubis", color: "text-destructive bg-destructive/8 border-destructive/15" },
+                    { action: "pick", team: "G2", map: "Inferno", color: "text-accent bg-accent/8 border-accent/15" },
+                    { action: "pick", team: "FaZe", map: "Nuke", color: "text-accent bg-accent/8 border-accent/15" },
+                  ].map((v, i) => (
+                    <div key={i} className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs border ${v.color}`}>
+                      <span className="font-bold uppercase tracking-wider">{v.team} {v.action}</span>
+                      <span className="font-bold">{v.map}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
