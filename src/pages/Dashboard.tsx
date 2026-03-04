@@ -57,8 +57,9 @@ const Dashboard = () => {
 
   const matchCount = matches?.length ?? 0;
   const predCount = predictions?.filter(p => p.analysis)?.length ?? 0;
-  const avgConfidence = predictions?.length
-    ? (predictions.reduce((s, p) => s + (p.analysis?.prediction?.confidence ?? 0), 0) / predictions.filter(p => p.analysis).length).toFixed(1)
+  const analysedPredictions = predictions?.filter(p => p.analysis) ?? [];
+  const avgConfidence = analysedPredictions.length
+    ? (analysedPredictions.reduce((s, p) => s + (p.analysis?.prediction?.confidence ?? 0), 0) / analysedPredictions.length).toFixed(1)
     : "—";
 
   const bestPick = predictions
@@ -204,8 +205,8 @@ const Dashboard = () => {
             <div className="divide-y divide-border">
               {predictions?.map((p, i) => {
                 if (!p.analysis) return null;
-                const prob = p.analysis.prediction.winProbability;
-                const conf = p.analysis.prediction.confidence;
+                const prob = p.analysis?.prediction?.winProbability ?? { team1: 50, team2: 50 };
+                const conf = p.analysis?.prediction?.confidence ?? 0;
                 const isHighConf = conf >= 70;
                 return (
                   <motion.div
@@ -303,7 +304,7 @@ const Dashboard = () => {
                   {/* Quick odds */}
                   <div className="space-y-2">
                     <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Bookmaker Odds</p>
-                    {Object.entries(bestPick.analysis.odds.team1 || {}).slice(0, 3).map(([bk, odd]) => (
+                    {Object.entries(bestPick?.analysis?.odds?.team1 || {}).slice(0, 3).map(([bk, odd]) => (
                       <div key={bk} className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground capitalize">{bk}</span>
                         <span className="font-bold">{odd}</span>
