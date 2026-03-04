@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
@@ -44,28 +45,30 @@ const App = () => (
   <ThemeProvider>
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<AuthGuard><DashboardLayout /></AuthGuard>}>
-                <Route index element={<Dashboard />} />
-                <Route path="matches" element={<Matches />} />
-                <Route path="match/:id" element={<MatchDetail />} />
-                <Route path="predictions" element={<Predictions />} />
-                <Route path="odds" element={<OddsComparison />} />
-                <Route path="demo-betting" element={<DemoBetting />} />
-                <Route path="bet-tracker" element={<BetTracker />} />
-                <Route path="settings" element={<DashboardSettings />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <SubscriptionProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<AuthGuard><DashboardLayout /></AuthGuard>}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="matches" element={<Matches />} />
+                  <Route path="match/:id" element={<MatchDetail />} />
+                  <Route path="predictions" element={<Predictions />} />
+                  <Route path="odds" element={<OddsComparison />} />
+                  <Route path="demo-betting" element={<DemoBetting />} />
+                  <Route path="bet-tracker" element={<BetTracker />} />
+                  <Route path="settings" element={<DashboardSettings />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </SubscriptionProvider>
       </QueryClientProvider>
     </LanguageProvider>
   </ThemeProvider>

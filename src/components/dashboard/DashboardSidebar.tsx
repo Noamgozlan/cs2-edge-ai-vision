@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target } from "lucide-react";
+import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +27,7 @@ const DashboardSidebar = () => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const { t, language, setLanguage } = useLanguage();
+  const { isPro, openCheckout, openPortal } = useSubscription();
 
   return (
     <aside className="w-64 min-h-screen flex flex-col relative overflow-hidden"
@@ -126,12 +128,15 @@ const DashboardSidebar = () => {
         })}
       </nav>
 
-      {/* Pro upgrade card */}
       <div className="px-3 mb-3 relative z-10">
         <div className="rounded-xl p-4 relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, hsl(199 90% 55% / 0.1) 0%, hsl(270 80% 60% / 0.08) 100%)',
-            border: '1px solid hsl(199 90% 55% / 0.15)',
+            background: isPro
+              ? 'linear-gradient(135deg, hsl(160 60% 45% / 0.12) 0%, hsl(199 90% 55% / 0.08) 100%)'
+              : 'linear-gradient(135deg, hsl(199 90% 55% / 0.1) 0%, hsl(270 80% 60% / 0.08) 100%)',
+            border: isPro
+              ? '1px solid hsl(160 60% 45% / 0.2)'
+              : '1px solid hsl(199 90% 55% / 0.15)',
           }}
         >
           <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none"
@@ -139,16 +144,39 @@ const DashboardSidebar = () => {
               background: 'radial-gradient(circle, hsl(199 90% 55% / 0.15) 0%, transparent 70%)',
             }}
           />
-          <div className="flex items-center gap-2 mb-2">
-            <Crown className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold text-foreground">Pro Plan</span>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-            Unlock real-time edge data & unlimited AI predictions
-          </p>
-          <button className="w-full py-2 rounded-lg text-[11px] font-bold text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all shadow-md shadow-primary/20">
-            Go Premium
-          </button>
+          {isPro ? (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                <span className="text-xs font-bold text-accent">Pro Active</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                You have full access to all premium features
+              </p>
+              <button
+                onClick={openPortal}
+                className="w-full py-2 rounded-lg text-[11px] font-bold text-foreground bg-muted hover:bg-muted/80 transition-all"
+              >
+                Manage Subscription
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <Crown className="w-4 h-4 text-primary" />
+                <span className="text-xs font-bold text-foreground">Pro Plan</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                Unlock real-time edge data & unlimited AI predictions
+              </p>
+              <button
+                onClick={openCheckout}
+                className="w-full py-2 rounded-lg text-[11px] font-bold text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all shadow-md shadow-primary/20"
+              >
+                Go Premium — $19.99/mo
+              </button>
+            </>
+          )}
         </div>
       </div>
 
