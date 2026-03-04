@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchMatches, fetchAIAnalysis, Match } from "@/lib/api";
+import { fetchMatches, fetchAIAnalysis, Match, AlternativeBet } from "@/lib/api";
 import { TeamLogo } from "@/lib/team-logos";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -390,7 +390,6 @@ function BettingPanel({ match, stake, onStakeChange, onBet, disabled }: {
     queryFn: async () => {
       const analysis = await fetchAIAnalysis(match.team1, match.team2, match.event, match.format);
       const p = analysis.prediction;
-      // Build simple odds from probabilities
       const odds1 = p.winProbability.team1 > 0 ? +(100 / p.winProbability.team1).toFixed(2) : 2.0;
       const odds2 = p.winProbability.team2 > 0 ? +(100 / p.winProbability.team2).toFixed(2) : 2.0;
       return {
@@ -398,7 +397,11 @@ function BettingPanel({ match, stake, onStakeChange, onBet, disabled }: {
         team2Odds: odds2,
         confidence: p.confidence,
         recommended: p.recommendedBet,
+        betType: p.betType || "match_winner",
+        expectedValue: p.expectedValue,
         winner: p.winProbability.team1 >= p.winProbability.team2 ? match.team1 : match.team2,
+        alternativeBets: analysis.alternativeBets || [],
+        dataSource: analysis.dataSource || "training",
       };
     },
     staleTime: 10 * 60 * 1000,
@@ -416,12 +419,48 @@ function BettingPanel({ match, stake, onStakeChange, onBet, disabled }: {
 
   return (
     <div className="px-4 pb-4 space-y-3">
-      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-        <Zap className="w-3 h-3 text-primary" />
-        <span>AI Confidence: <strong className="text-primary">{data.confidence}%</strong></span>
-        <span className="mx-1">•</span>
-        <span>Recommended: <strong className="text-foreground">{data.recommended}</strong></span>
+      {/* Smart Bet Recommendation */}
+      <div className="rounded-lg p-3 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--accent) / 0.06) 100%)",
+          border: "1px solid hsl(var(--primary) / 0.2)",
+        }}
+      >
+        <div className="flex items-center gap-2 mb-1">
+          <Zap className="w-3.5 h-3.5 text-primary" />
+          <span className="text-[9px] font-black text-primary uppercase tracking-widest">
+            Smart Bet — {data.betType.replace(/_/g, " ").toUpperCase()}
+          </span>
+          {data.dataSource === "live" && (
+            <span className="text-[8px] font-bold text-accent bg-accent/10 px-1 py-0.5 rounded ml-auto">LIVE DATA</span>
+          )}
+        </div>
+        <p className="text-sm font-bold">{data.recommended}</p>
+        <div className="flex items-center gap-3 mt-1.5">
+          <span className="text-[10px] font-bold text-primary">{data.confidence}% confidence</span>
+          {data.expectedValue && (
+            <span className="text-[10px] font-bold text-accent">EV: {data.expectedValue}</span>
+          )}
+        </div>
       </div>
+
+      {/* Alternative Smart Bets */}
+      {data.alternativeBets.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alternative Bets</p>
+          {data.alternativeBets.slice(0, 3).map((alt: AlternativeBet, i: number) => (
+            <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 border border-border">
+              <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground whitespace-nowrap">
+                {alt.betType.replace(/_/g, " ")}
+              </span>
+              <span className="text-xs font-bold flex-1 truncate">{alt.bet}</span>
+              <span className={`text-[10px] font-bold ${alt.confidence >= 70 ? "text-accent" : "text-muted-foreground"}`}>
+                {alt.confidence}%
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Stake input */}
       <div className="flex items-center gap-2">
