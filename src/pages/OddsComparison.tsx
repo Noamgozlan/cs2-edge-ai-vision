@@ -23,8 +23,12 @@ interface MatchOdds {
 const MatchOddsCard = ({ match, odds, loading, error }: MatchOdds) => {
   const { t } = useLanguage();
 
+  const getOdd = (side: "team1" | "team2", bk: string) => {
+    return odds?.[side]?.[bk] || "—";
+  };
+
   const bestOdd = (side: "team1" | "team2") => {
-    if (!odds) return "0";
+    if (!odds?.[side]) return "0";
     const values = Object.values(odds[side]).map(Number).filter(n => !isNaN(n));
     return values.length ? Math.max(...values).toFixed(2) : "0";
   };
@@ -76,11 +80,11 @@ const MatchOddsCard = ({ match, odds, loading, error }: MatchOdds) => {
               {BOOKMAKERS.map((bk) => (
                 <tr key={bk} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
                   <td className="p-4 font-medium">{BOOKMAKER_LABELS[bk]}</td>
-                  <td className={`p-4 text-center font-bold ${odds.team1[bk] === bestOdd("team1") ? "text-accent" : ""}`}>
-                    {odds.team1[bk] || "—"}
+                  <td className={`p-4 text-center font-bold ${getOdd("team1", bk) === bestOdd("team1") ? "text-accent" : ""}`}>
+                    {getOdd("team1", bk)}
                   </td>
-                  <td className={`p-4 text-center font-bold ${odds.team2[bk] === bestOdd("team2") ? "text-accent" : ""}`}>
-                    {odds.team2[bk] || "—"}
+                  <td className={`p-4 text-center font-bold ${getOdd("team2", bk) === bestOdd("team2") ? "text-accent" : ""}`}>
+                    {getOdd("team2", bk)}
                   </td>
                 </tr>
               ))}
