@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const matches = [
   { id: "1", team1: "M80", team2: "Team Liquid", event: "PGL Major", time: "15:00 CET", format: "Bo3", rank1: 14, rank2: 8 },
@@ -12,39 +13,41 @@ const matches = [
 ];
 
 const Matches = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-display font-bold">Upcoming Matches</h1>
-        <p className="text-sm text-muted-foreground">Today's CS2 matches with AI analysis available</p>
+        <h1 className="text-2xl font-bold">{t("matches.title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("matches.subtitle")}</p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {matches.map((m, i) => (
           <motion.div
             key={m.id}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            transition={{ delay: i * 0.04 }}
           >
             <Link
               to={`/dashboard/match/${m.id}`}
-              className="block rounded-xl bg-card border border-border/50 p-5 hover:border-primary/30 hover:glow-blue transition-all"
+              className="block rounded-xl bg-card border border-border p-5 hover:border-primary/30 hover:glow-blue transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
                   <div className="text-right w-32">
-                    <p className="font-display font-bold">{m.team1}</p>
+                    <p className="font-semibold">{m.team1}</p>
                     <p className="text-xs text-muted-foreground">#{m.rank1}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground font-display">VS</span>
+                  <span className="text-xs text-muted-foreground font-display font-bold">VS</span>
                   <div className="w-32">
-                    <p className="font-display font-bold">{m.team2}</p>
+                    <p className="font-semibold">{m.team2}</p>
                     <p className="text-xs text-muted-foreground">#{m.rank2}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="border-border/50 text-muted-foreground">{m.format}</Badge>
+                  <Badge variant="outline">{m.format}</Badge>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">{m.event}</p>
                     <p className="text-xs font-medium text-primary">{m.time}</p>
