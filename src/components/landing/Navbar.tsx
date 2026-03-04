@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
-import { Sun, Moon, Globe, Zap, Menu } from "lucide-react";
+import { Sun, Moon, Globe, Menu } from "lucide-react";
+import gozlanLogo from "@/assets/gozlan-logo.png";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,13 +20,8 @@ const Navbar = () => {
       <div className="max-w-screen-xl mx-auto px-6 lg:px-12">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-md shadow-primary/30">
-              <Zap className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-black tracking-tight">
-              CS2<span className="text-primary">Edge</span>
-            </span>
+          <Link to="/" className="flex items-center">
+            <img src={gozlanLogo} alt="Gozlan BETS" className="h-10 w-auto" />
           </Link>
 
           {/* Nav */}
