@@ -22,7 +22,7 @@ type Tab = typeof TABS[number];
 const MatchDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>("Analysis");
 
   const team1 = searchParams.get("team1") || "Team A";
@@ -34,8 +34,8 @@ const MatchDetail = () => {
   const rank2 = searchParams.get("rank2") || "";
 
   const { data: analysis, isLoading, error } = useQuery({
-    queryKey: ["ai-analysis", team1, team2, event, format],
-    queryFn: () => fetchAIAnalysis(team1, team2, event, format),
+    queryKey: ["ai-analysis", team1, team2, event, format, language],
+    queryFn: () => fetchAIAnalysis(team1, team2, event, format, language),
     staleTime: 10 * 60 * 1000,
     retry: 1,
   });
