@@ -1,24 +1,67 @@
 import { Outlet } from "react-router-dom";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { Search, Bell, Zap } from "lucide-react";
+import { Search, Bell, Zap, Menu, X } from "lucide-react";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const DashboardLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="flex h-screen overflow-hidden">
-      <DashboardSidebar />
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        <DashboardSidebar />
+      </div>
+
+      {/* Mobile sidebar overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.div
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed inset-y-0 left-0 z-50 lg:hidden"
+            >
+              <DashboardSidebar />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-16 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between px-8 z-10">
-          <div className="flex items-center gap-4 flex-1">
-            <h2 className="text-xl font-bold">Dashboard</h2>
+        <header className="h-14 sm:h-16 border-b border-border bg-card/50 backdrop-blur-md flex items-center justify-between px-4 sm:px-8 z-10 flex-shrink-0">
+          <div className="flex items-center gap-3 flex-1">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-muted transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg sm:text-xl font-bold hidden sm:block">Dashboard</h2>
             <div className="hidden md:flex items-center bg-muted rounded-lg px-3 py-1.5 w-full max-w-md">
               <Search className="w-4 h-4 text-muted-foreground" />
-              <input className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full ml-2 placeholder:text-muted-foreground" placeholder="Search teams, players or leagues..." type="text" />
+              <input
+                className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full ml-2 placeholder:text-muted-foreground"
+                placeholder="Search teams, players or leagues..."
+                type="text"
+              />
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-destructive rounded-full border-2 border-card" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors relative">
+              <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
+              <span className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 w-2 h-2 bg-destructive rounded-full border-2 border-card" />
             </button>
             <button className="hidden sm:flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
               <Zap className="w-4 h-4" />
@@ -26,7 +69,7 @@ const DashboardLayout = () => {
             </button>
           </div>
         </header>
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <Outlet />
         </div>
       </main>
