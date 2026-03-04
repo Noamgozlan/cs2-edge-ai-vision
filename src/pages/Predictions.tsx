@@ -28,7 +28,7 @@ const Predictions = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            className="rounded-xl bg-card border border-border p-5 hover:border-primary/30 transition-all"
+            className="rounded-xl bg-card border border-border p-5 hover:border-primary/50 transition-all"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -37,10 +37,10 @@ const Predictions = () => {
               </div>
               <div className="text-right flex items-center gap-3">
                 <p className="text-sm font-semibold text-accent">{p.bet} @ {p.odds}</p>
-                <Badge className={`font-display border-0 ${
+                <Badge className={`border-0 ${
                   p.confidence >= 80 ? "bg-accent/15 text-accent" :
                   p.confidence >= 70 ? "bg-primary/15 text-primary" :
-                  "bg-secondary/15 text-secondary"
+                  "bg-muted text-muted-foreground"
                 }`}>
                   {p.confidence}%
                 </Badge>
