@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { TimezoneProvider } from "@/contexts/TimezoneContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +46,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 const App = () => (
   <ThemeProvider>
     <LanguageProvider>
+      <TimezoneProvider>
       <QueryClientProvider client={queryClient}>
         <SubscriptionProvider>
           <TooltipProvider>
@@ -72,6 +74,7 @@ const App = () => (
           </TooltipProvider>
         </SubscriptionProvider>
       </QueryClientProvider>
+      </TimezoneProvider>
     </LanguageProvider>
   </ThemeProvider>
 );

@@ -1,11 +1,19 @@
 import { Outlet } from "react-router-dom";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { Search, Bell, Zap, Menu, X } from "lucide-react";
+import { Search, Bell, Zap, Menu, X, Clock } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTimezone } from "@/contexts/TimezoneContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { timezone, timezoneLabel, setTimezone, timezones } = useTimezone();
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -59,6 +67,27 @@ const DashboardLayout = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Timezone Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-border text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{timezoneLabel}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="max-h-72 overflow-y-auto w-56">
+                {timezones.map((tz) => (
+                  <DropdownMenuItem
+                    key={tz.value}
+                    onClick={() => setTimezone(tz.value)}
+                    className={timezone === tz.value ? "bg-primary/10 text-primary font-bold" : ""}
+                  >
+                    {tz.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors relative">
               <Bell className="w-4 sm:w-5 h-4 sm:h-5" />
               <span className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 w-2 h-2 bg-destructive rounded-full border-2 border-card" />
