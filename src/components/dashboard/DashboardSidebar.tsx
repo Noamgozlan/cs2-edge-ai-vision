@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2 } from "lucide-react";
+import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2, Wallet } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -20,6 +20,7 @@ const navItems: { titleKey: TranslationKeys | string; url: string; icon: typeof 
   { titleKey: "dash.oddsComparison", url: "/dashboard/odds", icon: BarChart3 },
   { titleKey: "Demo Betting", url: "/dashboard/demo-betting", icon: CircleDollarSign },
   { titleKey: "Bet Tracker", url: "/dashboard/bet-tracker", icon: Target, badge: "NEW" },
+  { titleKey: "Bankroll", url: "/dashboard/bankroll", icon: Wallet },
   { titleKey: "dash.settings", url: "/dashboard/settings", icon: Settings },
 ];
 

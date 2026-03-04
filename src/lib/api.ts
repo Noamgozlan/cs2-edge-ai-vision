@@ -39,6 +39,30 @@ export interface AlternativeBet {
   reasoning: string;
 }
 
+export interface MapBreakdownData {
+  map: string;
+  team1WinRate: number;
+  team2WinRate: number;
+  team1CtWinPct: number;
+  team1TWinPct: number;
+  team2CtWinPct: number;
+  team2TWinPct: number;
+  team1PistolWinPct: number;
+  team2PistolWinPct: number;
+  totalRoundsAvg: number;
+  edge: string;
+}
+
+export interface PlayerFormData {
+  name: string;
+  team: string;
+  recentRatings: number[];
+  trend: "stable" | "rising" | "declining";
+  avgKills: number;
+  clutchRate: string;
+  openingDuelWinRate: string;
+}
+
 export interface MatchAnalysis {
   prediction: {
     recommendedBet: string;
@@ -49,6 +73,8 @@ export interface MatchAnalysis {
   };
   alternativeBets?: AlternativeBet[];
   veto: VetoStep[];
+  mapBreakdown?: MapBreakdownData[];
+  playerForm?: PlayerFormData[];
   analysis: {
     summary: string;
     sections: AnalysisSection[];
