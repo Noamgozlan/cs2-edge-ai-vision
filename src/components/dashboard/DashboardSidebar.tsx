@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2, Wallet } from "lucide-react";
+import { LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2, Wallet } from "lucide-react";
+import gozlanLogo from "@/assets/gozlan-logo.png";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -52,14 +53,8 @@ const DashboardSidebar = () => {
 
       {/* Logo */}
       <div className="p-5 pb-6 relative z-10">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
-            <Crosshair className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display text-[11px] font-black tracking-[0.2em] text-foreground">CS2 EDGE</span>
-            <span className="font-display text-[9px] font-medium tracking-[0.3em] text-primary">INTELLIGENCE</span>
-          </div>
+        <Link to="/" className="flex items-center group">
+          <img src={gozlanLogo} alt="Gozlan BETS" className="h-9 w-auto" />
         </Link>
       </div>
 
