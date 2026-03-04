@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTimezone } from "@/contexts/TimezoneContext";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMatches, Match } from "@/lib/api";
 import { Loader2, TrendingUp, Calendar, BarChart3, Heart, Zap, Clock } from "lucide-react";
@@ -21,6 +22,7 @@ function matchLink(m: Match) {
 
 const Matches = () => {
   const { t } = useLanguage();
+  const { convertTime, timezoneLabel } = useTimezone();
   const [activeFilter, setActiveFilter] = useState(0);
 
   const { data: matches, isLoading, error } = useQuery({
@@ -100,7 +102,7 @@ const Matches = () => {
                   {featured.team1} <span className="text-muted-foreground font-normal text-lg mx-1">vs</span> {featured.team2}
                 </h2>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {featured.time}</span>
+                  <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {convertTime(featured.time)}</span>
                   <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {featured.format} Series</span>
                 </div>
               </div>
@@ -139,7 +141,7 @@ const Matches = () => {
               <div className="h-px w-20 bg-border" />
             </div>
             <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-              <Clock className="w-3 h-3" /> Local Time: CET
+              <Clock className="w-3 h-3" /> {timezoneLabel}
             </span>
           </div>
 
@@ -158,7 +160,7 @@ const Matches = () => {
                 >
                   {/* Time */}
                   <div className="w-16 shrink-0 text-center">
-                    <p className="text-lg font-black">{m.time.split(" ")[0]}</p>
+                    <p className="text-lg font-black">{convertTime(m.time).split(" ")[0]}</p>
                     <p className="text-[9px] font-bold uppercase text-muted-foreground tracking-widest">Today</p>
                   </div>
 

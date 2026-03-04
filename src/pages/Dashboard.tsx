@@ -4,6 +4,7 @@ import {
   Target, Shield, Flame, DollarSign, BarChart3, ChevronRight, Trophy
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTimezone } from "@/contexts/TimezoneContext";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMatches, fetchAIAnalysis, Match } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,6 +110,7 @@ function useDemoBetStats() {
 
 const Dashboard = () => {
   const { t } = useLanguage();
+  const { convertTime } = useTimezone();
 
   const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ["matches"],
@@ -244,7 +246,7 @@ const Dashboard = () => {
                 {/* Meta */}
                 <div className="text-center sm:text-right flex-shrink-0">
                   <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{featured.event}</p>
-                  <p className="text-sm font-bold text-primary">{featured.time}</p>
+                  <p className="text-sm font-bold text-primary">{convertTime(featured.time)}</p>
                   <p className="text-[10px] font-bold text-primary flex items-center gap-1 justify-center sm:justify-end mt-1">
                     View Analysis <ChevronRight className="w-3 h-3" />
                   </p>
@@ -294,7 +296,7 @@ const Dashboard = () => {
                       <TeamLogo name={m.team2} size={24} />
                       <div className="hidden sm:flex items-center gap-2 ml-2">
                         <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted font-bold text-muted-foreground">{m.format}</span>
-                        <span className="text-xs font-bold text-primary">{m.time}</span>
+                        <span className="text-xs font-bold text-primary">{convertTime(m.time)}</span>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                     </Link>
@@ -350,7 +352,7 @@ const Dashboard = () => {
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-bold truncate">{p.match.team1} vs {p.match.team2}</p>
-                          <p className="text-[10px] text-muted-foreground">{p.match.event} · {p.match.time}</p>
+                          <p className="text-[10px] text-muted-foreground">{p.match.event} · {convertTime(p.match.time)}</p>
                         </div>
                         <div className="flex items-center gap-3 sm:gap-4">
                           <div className="text-center">
