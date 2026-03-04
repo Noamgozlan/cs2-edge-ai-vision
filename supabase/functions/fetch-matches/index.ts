@@ -54,30 +54,30 @@ async function fetchFromRapidAPI(): Promise<any[]> {
       return [];
     }
 
-    const data = await res.json();
-    console.log("RapidAPI raw response keys:", Object.keys(data));
+    const json = await res.json();
+    console.log("RapidAPI raw response keys:", Object.keys(json));
 
-    // Handle different possible response shapes
-    const matchList = Array.isArray(data) ? data : data.matches || data.data || data.results || [];
+    // API returns { data: [...], meta: {...} }
+    const matchList = Array.isArray(json) ? json : json.data || json.matches || json.results || [];
 
     if (!Array.isArray(matchList) || matchList.length === 0) {
       console.log("No matches in RapidAPI response");
       return [];
     }
 
-    console.log("First match sample:", JSON.stringify(matchList[0]).substring(0, 500));
+    console.log("First match sample:", JSON.stringify(matchList[0]).substring(0, 600));
 
     return matchList.map((m: any, i: number) => {
-      // Extract team names from various possible structures
-      const team1 = m.team1?.name || m.teams?.[0]?.name || m.home_team?.name || m.homeTeam || m.team1_name || "TBD";
-      const team2 = m.team2?.name || m.teams?.[1]?.name || m.away_team?.name || m.awayTeam || m.team2_name || "TBD";
-      
-      // Extract event/tournament
-      const event = m.tournament?.name || m.event?.name || m.league?.name || m.tournament_name || m.event_name || "CS2 Match";
-      
-      // Extract time
+      // The API uses team_won / team_lose structure
+      const team1Name = m.team_won?.title || m.team1?.name || m.teams?.[0]?.name || m.home_team?.name || "TBD";
+      const team2Name = m.team_lose?.title || m.team2?.name || m.teams?.[1]?.name || m.away_team?.name || "TBD";
+
+      // Event / tournament
+      const event = m.event?.title || m.tournament?.name || m.event?.name || m.league?.name || "CS2 Match";
+
+      // Time from created_at or other date fields
       let time = "TBD";
-      const timestamp = m.date || m.start_time || m.scheduled_at || m.begin_at || m.startTime || m.timestamp;
+      const timestamp = m.played_at || m.created_at || m.date || m.start_time || m.scheduled_at || m.begin_at;
       if (timestamp) {
         try {
           const d = new Date(timestamp);
@@ -87,29 +87,33 @@ async function fetchFromRapidAPI(): Promise<any[]> {
         } catch { /* keep TBD */ }
       }
 
-      // Extract format
-      const format = m.format || m.match_type || m.bestOf ? `Bo${m.bestOf || m.best_of || 3}` : (m.number_of_games ? `Bo${m.number_of_games}` : "Bo3");
+      // Format - check best_of or number_of_games
+      const bo = m.best_of || m.bestOf || m.number_of_games || 3;
+      const format = m.format || `Bo${bo}`;
 
-      // Extract scores if available
-      const score1 = m.team1?.score ?? m.teams?.[0]?.score ?? m.score1 ?? m.home_score ?? null;
-      const score2 = m.team2?.score ?? m.teams?.[1]?.score ?? m.score2 ?? m.away_score ?? null;
+      // Scores
+      const score1 = m.score_won ?? m.team1?.score ?? m.teams?.[0]?.score ?? null;
+      const score2 = m.score_lose ?? m.team2?.score ?? m.teams?.[1]?.score ?? null;
 
-      // Extract status
-      const status = m.status || m.state || m.match_status || "";
+      // Status
+      const status = m.status || m.state || (score1 != null ? "finished" : "upcoming");
 
-      // Extract team logos
-      const team1Logo = m.team1?.logo || m.teams?.[0]?.logo || m.team1?.image_url || null;
-      const team2Logo = m.team2?.logo || m.teams?.[1]?.logo || m.team2?.image_url || null;
+      // Team logos
+      const team1Logo = m.team_won?.image_url || m.team1?.logo || null;
+      const team2Logo = m.team_lose?.image_url || m.team2?.logo || null;
+
+      // Stars as a rough rank proxy
+      const stars = m.stars || 0;
 
       return {
-        id: m.id?.toString() || m._id || `rapid-${i}`,
-        team1,
-        team2,
+        id: m.id?.toString() || `rapid-${i}`,
+        team1: team1Name,
+        team2: team2Name,
         event,
         time,
-        format: typeof format === "string" ? format : "Bo3",
-        rank1: m.team1?.ranking || m.teams?.[0]?.ranking || 0,
-        rank2: m.team2?.ranking || m.teams?.[1]?.ranking || 0,
+        format: typeof format === "string" ? format : `Bo${bo}`,
+        rank1: stars > 0 ? stars : 0,
+        rank2: 0,
         score1,
         score2,
         status,
