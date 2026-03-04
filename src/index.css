@@ -117,4 +117,7 @@
     @apply backdrop-blur-md;
     background: hsl(var(--background) / 0.8);
   }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
