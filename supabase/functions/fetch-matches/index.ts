@@ -5,18 +5,19 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const GRID_GRAPHQL_URL = "https://api-op.grid.gg/central-data/graphql";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Primary: RapidAPI CSGO Matches
-    const rapidApiMatches = await fetchFromRapidAPI();
-    if (rapidApiMatches.length > 0) {
-      console.log(`Fetched ${rapidApiMatches.length} matches from RapidAPI`);
-      return jsonResponse(rapidApiMatches);
+    const matches = await fetchFromGRID();
+    if (matches.length > 0) {
+      console.log(`Fetched ${matches.length} matches from GRID`);
+      return jsonResponse(matches);
     }
 
-    console.log("RapidAPI returned no matches, using fallback");
+    console.log("GRID returned no matches, using fallback");
     return jsonResponse(getFallbackMatches());
   } catch (error) {
     console.error("Error:", error);
@@ -30,89 +31,130 @@ function jsonResponse(matches: any[]) {
   });
 }
 
-async function fetchFromRapidAPI(): Promise<any[]> {
-  const RAPIDAPI_KEY = Deno.env.get("RAPIDAPI_KEY");
-  if (!RAPIDAPI_KEY) {
-    console.error("RAPIDAPI_KEY not configured");
+async function fetchFromGRID(): Promise<any[]> {
+  const GRID_API_KEY = Deno.env.get("GRID_API_KEY");
+  if (!GRID_API_KEY) {
+    console.error("GRID_API_KEY not configured");
     return [];
   }
 
-  try {
-    const res = await fetch(
-      "https://csgo-matches-and-tournaments.p.rapidapi.com/matches?page=1&limit=20",
-      {
-        headers: {
-          "x-rapidapi-host": "csgo-matches-and-tournaments.p.rapidapi.com",
-          "x-rapidapi-key": RAPIDAPI_KEY,
-          "Content-Type": "application/json",
-        },
+  // Query upcoming and recent CS2 series
+  const query = `
+    query GetCS2Series {
+      series(
+        filter: {
+          titleIds: [29]
+          types: [BEST_OF_1, BEST_OF_2, BEST_OF_3, BEST_OF_5]
+        }
+        first: 20
+        orderBy: StartTimeScheduled
+        orderDirection: DESC
+      ) {
+        edges {
+          node {
+            id
+            type
+            format {
+              value
+            }
+            startTimeScheduled
+            state
+            tournament {
+              name
+            }
+            teams {
+              baseInfo {
+                name
+                logoUrl
+              }
+              score
+              won
+            }
+          }
+        }
       }
-    );
+    }
+  `;
+
+  try {
+    const res = await fetch(GRID_GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": GRID_API_KEY,
+      },
+      body: JSON.stringify({ query }),
+    });
 
     if (!res.ok) {
-      console.error("RapidAPI error:", res.status, await res.text());
+      const errText = await res.text();
+      console.error("GRID API error:", res.status, errText);
+
+      // If the schema doesn't match, try a simpler query
+      if (res.status === 400) {
+        return await fetchFromGRIDSimple(GRID_API_KEY);
+      }
       return [];
     }
 
     const json = await res.json();
-    console.log("RapidAPI raw response keys:", Object.keys(json));
+    console.log("GRID response keys:", JSON.stringify(Object.keys(json)));
 
-    // API returns { data: [...], meta: {...} }
-    const matchList = Array.isArray(json) ? json : json.data || json.matches || json.results || [];
-
-    if (!Array.isArray(matchList) || matchList.length === 0) {
-      console.log("No matches in RapidAPI response");
-      return [];
+    if (json.errors) {
+      console.error("GRID GraphQL errors:", JSON.stringify(json.errors));
+      // Try simpler query on schema errors
+      return await fetchFromGRIDSimple(GRID_API_KEY);
     }
 
-    console.log("First match sample:", JSON.stringify(matchList[0]).substring(0, 600));
+    const edges = json.data?.series?.edges || [];
+    if (edges.length === 0) {
+      console.log("No series in GRID response, trying simple query");
+      return await fetchFromGRIDSimple(GRID_API_KEY);
+    }
 
-    return matchList.map((m: any, i: number) => {
-      // The API uses team_won / team_lose structure
-      const team1Name = m.team_won?.title || m.team1?.name || m.teams?.[0]?.name || m.home_team?.name || "TBD";
-      const team2Name = m.team_lose?.title || m.team2?.name || m.teams?.[1]?.name || m.away_team?.name || "TBD";
+    return edges.map((edge: any, i: number) => {
+      const s = edge.node;
+      const teams = s.teams || [];
+      const team1 = teams[0]?.baseInfo?.name || "TBD";
+      const team2 = teams[1]?.baseInfo?.name || "TBD";
+      const team1Logo = teams[0]?.baseInfo?.logoUrl || null;
+      const team2Logo = teams[1]?.baseInfo?.logoUrl || null;
+      const score1 = teams[0]?.score ?? null;
+      const score2 = teams[1]?.score ?? null;
 
-      // Event / tournament
-      const event = m.event?.title || m.tournament?.name || m.event?.name || m.league?.name || "CS2 Match";
-
-      // Time from created_at or other date fields
       let time = "TBD";
-      const timestamp = m.played_at || m.created_at || m.date || m.start_time || m.scheduled_at || m.begin_at;
-      if (timestamp) {
+      if (s.startTimeScheduled) {
         try {
-          const d = new Date(timestamp);
+          const d = new Date(s.startTimeScheduled);
           if (!isNaN(d.getTime())) {
             time = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")} CET`;
           }
         } catch { /* keep TBD */ }
       }
 
-      // Format - check best_of or number_of_games
-      const bo = m.best_of || m.bestOf || m.number_of_games || 3;
-      const format = m.format || `Bo${bo}`;
+      const formatMap: Record<string, string> = {
+        BEST_OF_1: "Bo1",
+        BEST_OF_2: "Bo2",
+        BEST_OF_3: "Bo3",
+        BEST_OF_5: "Bo5",
+      };
+      const format = formatMap[s.type] || s.format?.value || "Bo3";
 
-      // Scores
-      const score1 = m.score_won ?? m.team1?.score ?? m.teams?.[0]?.score ?? null;
-      const score2 = m.score_lose ?? m.team2?.score ?? m.teams?.[1]?.score ?? null;
-
-      // Status
-      const status = m.status || m.state || (score1 != null ? "finished" : "upcoming");
-
-      // Team logos
-      const team1Logo = m.team_won?.image_url || m.team1?.logo || null;
-      const team2Logo = m.team_lose?.image_url || m.team2?.logo || null;
-
-      // Stars as a rough rank proxy
-      const stars = m.stars || 0;
+      const stateMap: Record<string, string> = {
+        SCHEDULED: "upcoming",
+        STARTED: "live",
+        FINISHED: "finished",
+      };
+      const status = stateMap[s.state] || s.state || "upcoming";
 
       return {
-        id: m.id?.toString() || `rapid-${i}`,
-        team1: team1Name,
-        team2: team2Name,
-        event,
+        id: s.id?.toString() || `grid-${i}`,
+        team1,
+        team2,
+        event: s.tournament?.name || "CS2 Tournament",
         time,
-        format: typeof format === "string" ? format : `Bo${bo}`,
-        rank1: stars > 0 ? stars : 0,
+        format,
+        rank1: 0,
         rank2: 0,
         score1,
         score2,
@@ -122,7 +164,100 @@ async function fetchFromRapidAPI(): Promise<any[]> {
       };
     }).filter((m: any) => m.team1 !== "TBD" && m.team2 !== "TBD");
   } catch (err) {
-    console.error("RapidAPI fetch error:", err);
+    console.error("GRID fetch error:", err);
+    return [];
+  }
+}
+
+// Fallback simpler query if the schema differs
+async function fetchFromGRIDSimple(apiKey: string): Promise<any[]> {
+  const query = `
+    {
+      series(first: 20) {
+        edges {
+          node {
+            id
+            type
+            startTimeScheduled
+            state
+            tournament {
+              name
+            }
+            teams {
+              baseInfo {
+                name
+                logoUrl
+              }
+              score
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const res = await fetch(GRID_GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({ query }),
+    });
+
+    if (!res.ok) {
+      console.error("GRID simple query error:", res.status, await res.text());
+      return [];
+    }
+
+    const json = await res.json();
+    if (json.errors) {
+      console.error("GRID simple query GraphQL errors:", JSON.stringify(json.errors));
+      return [];
+    }
+
+    const edges = json.data?.series?.edges || [];
+    console.log(`GRID simple query returned ${edges.length} series`);
+
+    return edges.map((edge: any, i: number) => {
+      const s = edge.node;
+      const teams = s.teams || [];
+      const team1 = teams[0]?.baseInfo?.name || "TBD";
+      const team2 = teams[1]?.baseInfo?.name || "TBD";
+
+      let time = "TBD";
+      if (s.startTimeScheduled) {
+        try {
+          const d = new Date(s.startTimeScheduled);
+          if (!isNaN(d.getTime())) {
+            time = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")} CET`;
+          }
+        } catch { /* keep TBD */ }
+      }
+
+      const formatMap: Record<string, string> = {
+        BEST_OF_1: "Bo1", BEST_OF_2: "Bo2", BEST_OF_3: "Bo3", BEST_OF_5: "Bo5",
+      };
+
+      return {
+        id: s.id?.toString() || `grid-${i}`,
+        team1,
+        team2,
+        event: s.tournament?.name || "CS2 Tournament",
+        time,
+        format: formatMap[s.type] || "Bo3",
+        rank1: 0,
+        rank2: 0,
+        score1: teams[0]?.score ?? null,
+        score2: teams[1]?.score ?? null,
+        status: s.state === "STARTED" ? "live" : s.state === "FINISHED" ? "finished" : "upcoming",
+        team1Badge: teams[0]?.baseInfo?.logoUrl || null,
+        team2Badge: teams[1]?.baseInfo?.logoUrl || null,
+      };
+    }).filter((m: any) => m.team1 !== "TBD" && m.team2 !== "TBD");
+  } catch (err) {
+    console.error("GRID simple fetch error:", err);
     return [];
   }
 }
@@ -135,7 +270,5 @@ function getFallbackMatches() {
     { id: "4", team1: "Heroic", team2: "Virtus.pro", event: "ESL Pro League S23", time: "12:00 CET", format: "Bo3", rank1: 7, rank2: 8 },
     { id: "5", team1: "Cloud9", team2: "Eternal Fire", event: "PGL Major Berlin 2026", time: "14:00 CET", format: "Bo3", rank1: 9, rank2: 10 },
     { id: "6", team1: "The MongolZ", team2: "paiN Gaming", event: "IEM Katowice 2026", time: "20:00 CET", format: "Bo1", rank1: 11, rank2: 12 },
-    { id: "7", team1: "Complexity", team2: "BIG", event: "ESL Pro League S23", time: "16:00 CET", format: "Bo3", rank1: 13, rank2: 14 },
-    { id: "8", team1: "3DMAX", team2: "SAW", event: "BLAST Premier Spring 2026", time: "18:30 CET", format: "Bo3", rank1: 15, rank2: 16 },
   ];
 }
