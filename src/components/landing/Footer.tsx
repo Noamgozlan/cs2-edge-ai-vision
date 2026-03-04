@@ -7,7 +7,7 @@ const Footer = () => (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
         <div className="col-span-2 md:col-span-1">
           <div className="mb-4">
-            <img src={gozlanLogo} alt="Gozlan BETS" className="h-9 w-auto" />
+            <img src={gozlanLogo} alt="Gozlan BETS" className="h-14 w-auto" />
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
             AI-powered CS2 betting intelligence. Real data, smart predictions, better results.
