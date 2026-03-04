@@ -32,12 +32,21 @@ export interface PlayerStat {
   impact: string;
 }
 
+export interface AlternativeBet {
+  bet: string;
+  betType: string;
+  confidence: number;
+  reasoning: string;
+}
+
 export interface MatchAnalysis {
   prediction: {
     recommendedBet: string;
+    betType?: string;
     confidence: number;
     winProbability: { team1: number; team2: number };
   };
+  alternativeBets?: AlternativeBet[];
   veto: VetoStep[];
   analysis: {
     summary: string;
