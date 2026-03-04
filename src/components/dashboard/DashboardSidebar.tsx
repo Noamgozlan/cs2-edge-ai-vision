@@ -52,9 +52,9 @@ const DashboardSidebar = () => {
       />
 
       {/* Logo */}
-      <div className="p-5 pb-8 pt-6 relative z-10">
+      <div className="p-5 pb-10 pt-7 relative z-10">
         <Link to="/" className="flex items-center group">
-          <img src={gozlanLogo} alt="Gozlan BETS" className="h-14 w-auto" />
+          <img src={gozlanLogo} alt="Gozlan BETS" className="h-20 w-auto" />
         </Link>
       </div>
 
