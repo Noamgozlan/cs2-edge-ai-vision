@@ -14,6 +14,169 @@ export type Database = {
   }
   public: {
     Tables: {
+      cs2_matches: {
+        Row: {
+          created_at: string
+          id: string
+          is_stale: boolean
+          last_updated_utc: string
+          map: string | null
+          match_format: string
+          score: string | null
+          source: string
+          source_match_id: string | null
+          start_time_utc: string | null
+          status: string
+          team1_id: string | null
+          team1_logo: string | null
+          team1_name: string
+          team1_rank: number | null
+          team2_id: string | null
+          team2_logo: string | null
+          team2_name: string
+          team2_rank: number | null
+          tournament_id: string | null
+          tournament_name: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_stale?: boolean
+          last_updated_utc?: string
+          map?: string | null
+          match_format?: string
+          score?: string | null
+          source?: string
+          source_match_id?: string | null
+          start_time_utc?: string | null
+          status?: string
+          team1_id?: string | null
+          team1_logo?: string | null
+          team1_name: string
+          team1_rank?: number | null
+          team2_id?: string | null
+          team2_logo?: string | null
+          team2_name: string
+          team2_rank?: number | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_stale?: boolean
+          last_updated_utc?: string
+          map?: string | null
+          match_format?: string
+          score?: string | null
+          source?: string
+          source_match_id?: string | null
+          start_time_utc?: string | null
+          status?: string
+          team1_id?: string | null
+          team1_logo?: string | null
+          team1_name?: string
+          team1_rank?: number | null
+          team2_id?: string | null
+          team2_logo?: string | null
+          team2_name?: string
+          team2_rank?: number | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs2_matches_team1_id_fkey"
+            columns: ["team1_id"]
+            isOneToOne: false
+            referencedRelation: "cs2_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cs2_matches_team2_id_fkey"
+            columns: ["team2_id"]
+            isOneToOne: false
+            referencedRelation: "cs2_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cs2_matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "cs2_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cs2_teams: {
+        Row: {
+          country: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          ranking: number | null
+          short_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          ranking?: number | null
+          short_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          ranking?: number | null
+          short_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cs2_tournaments: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          start_date: string | null
+          tier: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          start_date?: string | null
+          tier?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          start_date?: string | null
+          tier?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       demo_bets: {
         Row: {
           created_at: string
