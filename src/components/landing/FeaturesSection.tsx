@@ -1,60 +1,79 @@
 import { motion } from "framer-motion";
-import { Brain, Map, TrendingUp, Timer, BarChart3, Bell } from "lucide-react";
+import { Brain, Map, TrendingUp, Timer, BarChart3, Crosshair } from "lucide-react";
 
 const features = [
   {
     icon: Brain,
-    title: "AI Predictions",
-    desc: "Advanced outcome probabilities calculated using deep learning models trained on 10 years of pro demos.",
+    title: "AI Match Predictions",
+    desc: "Deep learning models trained on 10+ years of pro match data deliver probability-weighted predictions across all bet types.",
+    stat: "73.2%",
+    statLabel: "Accuracy",
   },
   {
     icon: Map,
-    title: "Veto Simulation",
-    desc: "Predict team pick/ban behavior with 92% accuracy. Dominate the map selection phase before the match begins.",
+    title: "Map Veto Simulation",
+    desc: "Predict ban/pick sequences with map-specific win rate analysis and team preference modeling.",
+    stat: "92%",
+    statLabel: "Veto Accuracy",
   },
   {
     icon: TrendingUp,
-    title: "Odds Arbitrage",
-    desc: "Real-time discrepancy detection across global markets to find maximum value and locked-in profits.",
+    title: "Smart Bet Discovery",
+    desc: "Beyond match winner — the AI evaluates player props, handicaps, round totals, and more to find the highest-EV play.",
+    stat: "+14%",
+    statLabel: "Avg. EV",
   },
   {
     icon: Timer,
-    title: "Zero Latency",
-    desc: "Direct feed from official tournament servers ensures you have the numbers before the broadcast delay.",
+    title: "Real-Time HLTV Data",
+    desc: "Live-scraped stats from HLTV ensure every prediction uses the latest player form, roster changes, and results.",
+    stat: "< 5min",
+    statLabel: "Data Freshness",
   },
   {
     icon: BarChart3,
-    title: "Match Breakdown",
-    desc: "Deep-dive technical analysis into player form, utility efficiency, and tactical tendencies.",
+    title: "Odds Comparison",
+    desc: "Aggregated lines across major bookmakers so you always know where the best value sits before placing.",
+    stat: "6+",
+    statLabel: "Bookmakers",
   },
   {
-    icon: Bell,
-    title: "Direct Alerts",
-    desc: "Customizable high-priority push notifications for line movements or system-calculated value bets.",
+    icon: Crosshair,
+    title: "Player Prop Insights",
+    desc: "Kill lines, impact ratings, and opening duel stats power per-player betting recommendations with precision.",
+    stat: "50+",
+    statLabel: "Stats Per Player",
   },
 ];
 
 const FeaturesSection = () => (
-  <section id="features" className="py-32 border-y border-border/50 bg-background">
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-12">
+  <section id="features" className="py-28 bg-background relative overflow-hidden">
+    {/* Subtle background accent */}
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
+
+    <div className="max-w-screen-xl mx-auto px-6 lg:px-12 relative">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
-        <div>
-          <h2 className="text-primary text-[11px] font-black uppercase tracking-[0.4em] mb-4">
-            Tactical Intelligence
+      <div className="text-center mb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="inline-block text-[11px] font-bold text-primary uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5">
+            Features
+          </span>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+            Built for{" "}
+            <span className="text-primary">Serious</span> Bettors
           </h2>
-          <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
-            Beyond Human{" "}
-            <span className="italic text-muted-foreground">Intuition</span>
-          </h3>
-        </div>
-        <p className="text-muted-foreground max-w-md text-sm leading-relaxed">
-          Our neural networks analyze 500k+ data points per match to give you an unfair advantage in every engagement.
-        </p>
+          <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Every tool you need to find value, validate your reads, and make smarter CS2 bets — powered by real data and neural networks.
+          </p>
+        </motion.div>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/30">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {features.map((f, i) => (
           <motion.div
             key={f.title}
@@ -62,14 +81,22 @@ const FeaturesSection = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.06 }}
-            className="group p-10 bg-card hover:bg-muted/30 transition-all relative overflow-hidden"
+            className="group relative rounded-2xl border border-border bg-card p-7 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
           >
-            <div className="absolute top-4 right-4 opacity-[0.04] group-hover:opacity-[0.08] transition-opacity">
-              <f.icon className="w-24 h-24" />
+            {/* Icon */}
+            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors">
+              <f.icon className="w-5 h-5 text-primary" />
             </div>
-            <div className="w-10 h-[2px] bg-primary mb-8 group-hover:w-20 transition-all duration-500" />
-            <h4 className="text-xl font-bold mb-4 uppercase tracking-tight">{f.title}</h4>
-            <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+
+            {/* Content */}
+            <h4 className="text-base font-bold mb-2">{f.title}</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-5">{f.desc}</p>
+
+            {/* Stat pill */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-black text-primary">{f.stat}</span>
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{f.statLabel}</span>
+            </div>
           </motion.div>
         ))}
       </div>

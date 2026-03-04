@@ -1,139 +1,157 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Zap, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const plans = [
   {
-    name: "Standard",
+    name: "Free",
     price: { monthly: 0, yearly: 0 },
-    period: "Lifetime",
-    color: "text-muted-foreground",
+    desc: "Get started with basic predictions",
     features: [
-      "3 Tactical Simulations / Day",
-      "Public Intel Feed",
-      "Basic Performance Logs",
+      "3 AI predictions per day",
+      "Basic match analysis",
+      "Community insights",
+      "Public odds comparison",
     ],
-    cta: "Establish Link",
+    cta: "Get Started Free",
     highlight: false,
   },
   {
-    name: "Pro Edge",
-    price: { monthly: 19, yearly: 15 },
-    period: "Monthly",
-    color: "text-primary",
-    badge: "Operational Choice",
+    name: "Pro",
+    price: { monthly: 19.99, yearly: 14.99 },
+    desc: "Unlock the full AI advantage",
+    badge: "Most Popular",
     features: [
-      "Unlimited Veto Simulations",
-      "75% Confidence Tier Access",
-      "Real-time Arbitrage Tools",
-      "Encrypted Discord Alerts",
+      "Unlimited AI predictions",
+      "Smart bet recommendations",
+      "Player prop analysis",
+      "Map veto simulations",
+      "Real-time HLTV data",
+      "Priority support",
     ],
-    cta: "Initialize Protocol",
+    cta: "Start Pro Trial",
     highlight: true,
   },
   {
-    name: "Syndicate",
-    price: { monthly: 49, yearly: 39 },
-    period: "Monthly",
-    color: "text-accent",
+    name: "Elite",
+    price: { monthly: 49.99, yearly: 39.99 },
+    desc: "For professional bettors",
     features: [
-      "Everything in Pro Access",
-      "Ultra-High Confidence (90%+)",
-      "Private API Deployment",
-      "Custom Strategy Modeling",
+      "Everything in Pro",
+      "90%+ confidence alerts",
+      "Custom strategy models",
+      "API access",
+      "Dedicated analyst",
     ],
-    cta: "Join Syndicate",
+    cta: "Contact Us",
     highlight: false,
   },
 ];
 
 const PricingSection = () => {
-  const [yearly, setYearly] = useState(true);
+  const [yearly, setYearly] = useState(false);
 
   return (
-    <section id="pricing" className="py-32 bg-background">
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="text-center mb-24">
-          <h2 className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-4">The Selection</h2>
-          <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
-            Choose Your <span className="italic text-primary">Weapon</span>
-          </h3>
+    <section id="pricing" className="py-28 bg-background relative">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/[0.02] rounded-full blur-3xl pointer-events-none" />
 
-          <div className="mt-12 flex items-center justify-center gap-6">
-            <span className={`text-[11px] font-bold uppercase tracking-widest transition-colors ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>
-              Monthly
+      <div className="max-w-screen-xl mx-auto px-6 lg:px-12 relative">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-block text-[11px] font-bold text-primary uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5">
+              Pricing
             </span>
-            <button
-              onClick={() => setYearly(!yearly)}
-              className="w-16 h-8 rounded-full bg-muted border border-border p-1 relative flex items-center transition-all"
-            >
-              <div className={`w-6 h-6 bg-primary rounded-full shadow-[0_0_10px_hsl(var(--primary)/0.5)] transition-transform ${yearly ? "translate-x-8" : "translate-x-0"}`} />
-            </button>
-            <div className="flex items-center gap-3">
-              <span className={`text-[11px] font-bold uppercase tracking-widest transition-colors ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
-                Yearly Deployment
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+              Choose Your <span className="text-primary">Edge</span>
+            </h2>
+            <p className="text-muted-foreground max-w-md mx-auto mb-8">
+              Start free, upgrade when you're ready for unlimited AI-powered predictions.
+            </p>
+
+            {/* Toggle */}
+            <div className="flex items-center justify-center gap-4">
+              <span className={`text-sm font-bold transition-colors ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>
+                Monthly
               </span>
-              <span className="px-3 py-1 bg-destructive/20 text-destructive text-[9px] font-black uppercase tracking-widest rounded-full">
-                Save 25%
-              </span>
+              <button
+                onClick={() => setYearly(!yearly)}
+                className="w-14 h-7 rounded-full bg-muted border border-border p-1 relative flex items-center"
+              >
+                <div className={`w-5 h-5 bg-primary rounded-full shadow-md transition-transform ${yearly ? "translate-x-7" : "translate-x-0"}`} />
+              </button>
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-bold transition-colors ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
+                  Yearly
+                </span>
+                <span className="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+                  Save 25%
+                </span>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Plans */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {plans.map((plan, i) => (
             <motion.div
               key={plan.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className={`p-12 flex flex-col transition-all relative ${
+              transition={{ delay: i * 0.08 }}
+              className={`relative rounded-2xl p-7 flex flex-col transition-all ${
                 plan.highlight
-                  ? "bg-card border-x-2 border-primary md:scale-105 z-20 shadow-[0_0_50px_hsl(0_0%_0%/0.5)]"
-                  : "bg-card border border-border group hover:bg-muted/30"
+                  ? "bg-card border-2 border-primary shadow-xl shadow-primary/10 scale-[1.02]"
+                  : "bg-card border border-border hover:border-primary/30"
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.3em]">
-                  {plan.badge}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest rounded-full flex items-center gap-1.5">
+                  <Crown className="w-3 h-3" /> {plan.badge}
                 </div>
               )}
 
-              <h4 className={`text-xl font-bold mb-2 uppercase tracking-tight ${plan.color}`}>
-                {plan.name}
-              </h4>
-              <div className="mb-12">
-                <span className="text-5xl font-black italic">
+              <div className="mb-6">
+                <h4 className={`text-lg font-bold mb-1 ${plan.highlight ? "text-primary" : ""}`}>
+                  {plan.name}
+                </h4>
+                <p className="text-sm text-muted-foreground">{plan.desc}</p>
+              </div>
+
+              <div className="mb-8">
+                <span className="text-4xl font-black">
                   ${yearly ? plan.price.yearly : plan.price.monthly}
                 </span>
-                <span className="text-muted-foreground text-sm font-bold ml-1">
-                  / {plan.price.monthly === 0 ? "LIFETIME" : plan.period.toUpperCase()}
+                <span className="text-sm text-muted-foreground ml-1">
+                  {plan.price.monthly === 0 ? "" : "/mo"}
                 </span>
               </div>
 
-              <ul className="space-y-6 mb-16 flex-grow">
+              <ul className="space-y-3 mb-8 flex-grow">
                 {plan.features.map((f) => (
-                  <li key={f} className={`flex items-center gap-4 text-[11px] font-bold uppercase tracking-widest ${plan.highlight ? "text-foreground" : "text-muted-foreground"}`}>
-                    <Check className={`w-4 h-4 flex-shrink-0 ${plan.highlight ? "text-primary" : plan.color === "text-accent" ? "text-accent" : "text-primary"}`} />
-                    {f}
+                  <li key={f} className="flex items-start gap-3 text-sm">
+                    <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 ${plan.highlight ? "text-primary" : "text-accent"}`} />
+                    <span className="text-muted-foreground">{f}</span>
                   </li>
                 ))}
               </ul>
 
               <Link
                 to="/register"
-                className={`w-full py-5 text-center text-[11px] font-black uppercase tracking-widest transition-all block ${
+                className={`w-full py-3.5 rounded-xl text-center text-sm font-bold transition-all block ${
                   plan.highlight
-                    ? "bg-primary text-primary-foreground hover:opacity-90 shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
-                    : plan.color === "text-accent"
-                    ? "border border-border hover:bg-accent hover:text-accent-foreground hover:border-accent"
-                    : "border border-border hover:bg-foreground hover:text-background"
+                    ? "bg-primary text-primary-foreground hover:brightness-110 shadow-lg shadow-primary/20"
+                    : "border border-border hover:border-primary/40 hover:bg-primary/5 text-foreground"
                 }`}
               >
+                {plan.highlight && <Zap className="w-4 h-4 inline mr-2 -mt-0.5" />}
                 {plan.cta}
               </Link>
             </motion.div>
