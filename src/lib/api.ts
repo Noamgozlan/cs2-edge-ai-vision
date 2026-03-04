@@ -9,6 +9,8 @@ export interface Match {
   format: string;
   rank1: number;
   rank2: number;
+  team1Badge?: string | null;
+  team2Badge?: string | null;
 }
 
 export interface VetoStep {
