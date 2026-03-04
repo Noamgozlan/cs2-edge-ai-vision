@@ -1,6 +1,6 @@
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAIAnalysis, type MatchAnalysis } from "@/lib/api";
+import { fetchAIAnalysis, type MatchAnalysis, type AlternativeBet } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   ArrowLeft, Loader2, Zap, TrendingUp, Shield, Swords,
@@ -146,6 +146,61 @@ const MatchDetail = () => {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
+          {/* Recommended Bet Hero */}
+          <div className="rounded-2xl p-5 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--accent) / 0.1) 100%)",
+              border: "1px solid hsl(var(--primary) / 0.3)",
+            }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest">
+                AI Smart Bet — {analysis.prediction.betType?.replace(/_/g, " ").toUpperCase() || "BEST VALUE"}
+              </span>
+            </div>
+            <p className="text-2xl font-black">{analysis.prediction.recommendedBet}</p>
+            <div className="flex items-center gap-4 mt-3">
+              <span className="text-sm font-bold text-primary">{analysis.prediction.confidence}% confidence</span>
+              <span className="text-xs text-muted-foreground">
+                Win Prob: {team1} {analysis.prediction.winProbability.team1}% — {team2} {analysis.prediction.winProbability.team2}%
+              </span>
+            </div>
+          </div>
+
+          {/* Alternative Bets */}
+          {analysis.alternativeBets && analysis.alternativeBets.length > 0 && (
+            <div>
+              <h2 className="text-lg font-black flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4 text-accent" /> Alternative Smart Bets
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {analysis.alternativeBets.map((alt, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    className="rounded-xl border border-border bg-card p-4"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                        {alt.betType.replace(/_/g, " ")}
+                      </span>
+                      <span className={`text-xs font-bold ${
+                        alt.confidence >= 70 ? "text-accent" : "text-muted-foreground"
+                      }`}>
+                        {alt.confidence}%
+                      </span>
+                    </div>
+                    <p className="font-bold text-sm mb-1">{alt.bet}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{alt.reasoning}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Confidence Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-2xl border border-border bg-card p-5">
