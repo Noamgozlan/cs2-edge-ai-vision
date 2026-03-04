@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown } from "lucide-react";
+import { Crosshair, LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,12 @@ import {
 import { TranslationKeys } from "@/i18n/translations";
 import { motion } from "framer-motion";
 
-const navItems: { titleKey: TranslationKeys; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
+const navItems: { titleKey: TranslationKeys | string; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
   { titleKey: "dash.dashboard", url: "/dashboard", icon: LayoutDashboard },
   { titleKey: "dash.matches", url: "/dashboard/matches", icon: Swords, badge: "LIVE" },
   { titleKey: "dash.predictions", url: "/dashboard/predictions", icon: Brain },
   { titleKey: "dash.oddsComparison", url: "/dashboard/odds", icon: BarChart3 },
+  { titleKey: "Demo Betting", url: "/dashboard/demo-betting", icon: CircleDollarSign, badge: "NEW" },
   { titleKey: "dash.settings", url: "/dashboard/settings", icon: Settings },
 ];
 
@@ -107,7 +108,7 @@ const DashboardSidebar = () => {
                 )}
 
                 <item.icon className={`h-4 w-4 relative z-10 ${isActive ? "text-primary" : ""}`} />
-                <span className="relative z-10">{t(item.titleKey)}</span>
+                <span className="relative z-10">{item.titleKey.startsWith("dash.") ? t(item.titleKey as any) : item.titleKey}</span>
 
                 {item.badge && (
                   <span className="ml-auto relative z-10 px-1.5 py-0.5 rounded text-[9px] font-black bg-accent/15 text-accent border border-accent/20 animate-pulse">

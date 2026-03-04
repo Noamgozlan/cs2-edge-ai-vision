@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      demo_bets: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          match_id: string
+          odds_at_bet: number
+          payout: number
+          result: string
+          stake: number
+          team_picked: string
+          team1: string
+          team2: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event?: string
+          id?: string
+          match_id: string
+          odds_at_bet?: number
+          payout?: number
+          result?: string
+          stake?: number
+          team_picked: string
+          team1: string
+          team2: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          match_id?: string
+          odds_at_bet?: number
+          payout?: number
+          result?: string
+          stake?: number
+          team_picked?: string
+          team1?: string
+          team2?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
