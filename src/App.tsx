@@ -23,6 +23,7 @@ import DashboardSettings from "./pages/DashboardSettings";
 import DemoBetting from "./pages/DemoBetting";
 import BetTracker from "./pages/BetTracker";
 import BankrollManager from "./pages/BankrollManager";
+import TodaysMatches from "./pages/TodaysMatches";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
                   <Route path="demo-betting" element={<DemoBetting />} />
                   <Route path="bet-tracker" element={<BetTracker />} />
                   <Route path="bankroll" element={<BankrollManager />} />
+                  <Route path="todays-matches" element={<TodaysMatches />} />
                   <Route path="settings" element={<DashboardSettings />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />

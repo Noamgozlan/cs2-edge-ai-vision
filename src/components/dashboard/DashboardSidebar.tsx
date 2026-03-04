@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2, Wallet } from "lucide-react";
+import { LayoutDashboard, Swords, Brain, BarChart3, Settings, Sun, Moon, Globe, ChevronRight, Crown, CircleDollarSign, Target, CheckCircle2, Wallet, CalendarDays } from "lucide-react";
 import gozlanLogo from "@/assets/gozlan-logo.png";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 
 const navItems: { titleKey: TranslationKeys | string; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
   { titleKey: "dash.dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { titleKey: "Today's Matches", url: "/dashboard/todays-matches", icon: CalendarDays, badge: "NEW" },
   { titleKey: "dash.matches", url: "/dashboard/matches", icon: Swords, badge: "LIVE" },
   { titleKey: "dash.predictions", url: "/dashboard/predictions", icon: Brain },
   { titleKey: "dash.oddsComparison", url: "/dashboard/odds", icon: BarChart3 },
