@@ -32,7 +32,7 @@ const Matches = () => {
           >
             <Link
               to={`/dashboard/match/${m.id}`}
-              className="block rounded-xl bg-card border border-border p-5 hover:border-primary/30 hover:glow-blue transition-all"
+              className="block rounded-xl bg-card border border-border p-5 hover:border-primary/50 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
@@ -40,7 +40,7 @@ const Matches = () => {
                     <p className="font-semibold">{m.team1}</p>
                     <p className="text-xs text-muted-foreground">#{m.rank1}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground font-display font-bold">VS</span>
+                  <span className="text-xs text-muted-foreground font-bold">VS</span>
                   <div className="w-32">
                     <p className="font-semibold">{m.team2}</p>
                     <p className="text-xs text-muted-foreground">#{m.rank2}</p>

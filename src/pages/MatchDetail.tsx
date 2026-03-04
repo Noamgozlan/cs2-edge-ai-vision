@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft, TrendingUp, XCircle, CheckCircle, Scale } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -10,29 +9,29 @@ const MatchDetail = () => {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <Button variant="ghost" size="sm" asChild>
-        <Link to="/dashboard/matches"><ArrowLeft className="mr-2 h-4 w-4" />{t("match.back")}</Link>
-      </Button>
+      <Link to="/dashboard/matches" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> {t("match.back")}
+      </Link>
 
-      <div className="rounded-2xl bg-card border border-border overflow-hidden glow-blue">
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <span className="font-display font-bold text-xl">M80</span>
+              <span className="font-bold text-xl">M80</span>
               <span className="text-muted-foreground text-sm">vs</span>
-              <span className="font-display font-bold text-xl">Team Liquid</span>
+              <span className="font-bold text-xl">Team Liquid</span>
             </div>
             <p className="text-xs text-muted-foreground">PGL Major · Swiss Stage · Bo3</p>
           </div>
-          <Badge className="bg-gradient-primary border-0 font-display text-sm px-4 py-1 text-primary-foreground">72% {t("match.confidence")}</Badge>
+          <Badge className="bg-primary text-primary-foreground border-0 text-sm px-4 py-1">72% {t("match.confidence")}</Badge>
         </div>
 
-        <div className="p-6 border-b border-border bg-surface/30">
+        <div className="p-6 border-b border-border bg-muted/30">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="h-4 w-4 text-accent" />
             <span className="text-sm font-semibold text-accent">{t("match.recommendedBet")}</span>
           </div>
-          <p className="font-display font-bold text-2xl">M80 ML @ 1.82</p>
+          <p className="font-bold text-2xl">M80 ML @ 1.82</p>
         </div>
 
         <div className="p-6 border-b border-border">
@@ -70,36 +69,6 @@ const MatchDetail = () => {
               <p className="text-sm text-muted-foreground leading-relaxed">{section.text}</p>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div className="rounded-xl bg-card border border-border overflow-hidden">
-        <div className="p-5 border-b border-border">
-          <h2 className="font-semibold">{t("odds.title")}</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left p-4 text-muted-foreground font-medium">{t("odds.site")}</th>
-                <th className="text-center p-4 text-muted-foreground font-medium">M80</th>
-                <th className="text-center p-4 text-muted-foreground font-medium">Team Liquid</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { site: "HLTV Odds", m80: "1.82", liquid: "1.95" },
-                { site: "Bet365", m80: "1.80", liquid: "2.00" },
-                { site: "GGbet", m80: "1.85", liquid: "1.90" },
-              ].map((row) => (
-                <tr key={row.site} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
-                  <td className="p-4 font-medium">{row.site}</td>
-                  <td className="p-4 text-center font-display font-bold">{row.m80}</td>
-                  <td className="p-4 text-center font-display font-bold">{row.liquid}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
