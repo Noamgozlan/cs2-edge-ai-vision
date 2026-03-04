@@ -9,34 +9,14 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Strategy 1: Try direct HLTV fetch
-    const hltvMatches = await fetchHLTVDirect();
-    if (hltvMatches.length > 0) {
-      console.log(`Fetched ${hltvMatches.length} matches from HLTV`);
-      
-      // Enrich with TheSportsDB team badges
-      const enriched = await enrichWithBadges(hltvMatches);
-      return jsonResponse(enriched);
+    // Primary: RapidAPI CSGO Matches
+    const rapidApiMatches = await fetchFromRapidAPI();
+    if (rapidApiMatches.length > 0) {
+      console.log(`Fetched ${rapidApiMatches.length} matches from RapidAPI`);
+      return jsonResponse(rapidApiMatches);
     }
 
-    // Strategy 2: Try TheSportsDB for any CS2 events
-    const sportsDbMatches = await fetchFromSportsDB();
-    if (sportsDbMatches.length > 0) {
-      console.log(`Fetched ${sportsDbMatches.length} matches from TheSportsDB`);
-      return jsonResponse(sportsDbMatches);
-    }
-
-    // Strategy 3: Try Firecrawl if available
-    const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
-    if (FIRECRAWL_API_KEY) {
-      const firecrawlMatches = await fetchViaFirecrawl(FIRECRAWL_API_KEY);
-      if (firecrawlMatches.length > 0) {
-        console.log(`Fetched ${firecrawlMatches.length} matches via Firecrawl`);
-        return jsonResponse(firecrawlMatches);
-      }
-    }
-
-    console.log("All sources failed, using fallback");
+    console.log("RapidAPI returned no matches, using fallback");
     return jsonResponse(getFallbackMatches());
   } catch (error) {
     console.error("Error:", error);
@@ -50,262 +30,100 @@ function jsonResponse(matches: any[]) {
   });
 }
 
-// Direct HLTV scraping without Firecrawl
-async function fetchHLTVDirect(): Promise<any[]> {
-  try {
-    const res = await fetch("https://www.hltv.org/matches", {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Referer": "https://www.google.com/",
-      },
-    });
-
-    if (!res.ok) {
-      console.error("HLTV direct fetch failed:", res.status);
-      return [];
-    }
-
-    const html = await res.text();
-    return parseHLTVHtml(html);
-  } catch (err) {
-    console.error("HLTV direct error:", err);
+async function fetchFromRapidAPI(): Promise<any[]> {
+  const RAPIDAPI_KEY = Deno.env.get("RAPIDAPI_KEY");
+  if (!RAPIDAPI_KEY) {
+    console.error("RAPIDAPI_KEY not configured");
     return [];
   }
-}
 
-function parseHLTVHtml(html: string): any[] {
-  const matches: any[] = [];
-  
-  // Extract match data from HLTV HTML using regex patterns
-  // Match blocks: team1 vs team2 with event info
-  const matchRegex = /class="matchTeamName[^"]*"[^>]*>([^<]+)<[\s\S]*?class="matchTeamName[^"]*"[^>]*>([^<]+)<[\s\S]*?class="matchEvent[^"]*"[^>]*>[\s\S]*?title="([^"]*)"[\s\S]*?class="matchTime[^"]*"[^>]*data-unix="(\d+)"/g;
-  
-  let match;
-  let id = 1;
-  while ((match = matchRegex.exec(html)) !== null && id <= 15) {
-    const [, team1, team2, event, timestamp] = match;
-    const date = new Date(parseInt(timestamp));
-    const hours = date.getUTCHours().toString().padStart(2, "0");
-    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-    
-    matches.push({
-      id: `hltv-${id}`,
-      team1: team1.trim(),
-      team2: team2.trim(),
-      event: event.trim(),
-      time: `${hours}:${minutes} CET`,
-      format: "Bo3",
-      rank1: 0,
-      rank2: 0,
-    });
-    id++;
-  }
-
-  // Alternative simpler parsing if regex above doesn't match
-  if (matches.length === 0) {
-    // Try to find team names in a simpler pattern
-    const teamPairs = html.match(/matchTeamName[^>]*>([^<]+)</g);
-    if (teamPairs && teamPairs.length >= 2) {
-      for (let i = 0; i < teamPairs.length - 1; i += 2) {
-        const t1 = teamPairs[i].replace(/matchTeamName[^>]*>/, "").trim();
-        const t2 = teamPairs[i + 1]?.replace(/matchTeamName[^>]*>/, "").trim();
-        if (t1 && t2) {
-          matches.push({
-            id: `hltv-${matches.length + 1}`,
-            team1: t1,
-            team2: t2,
-            event: "CS2 Match",
-            time: "TBD",
-            format: "Bo3",
-            rank1: 0,
-            rank2: 0,
-          });
-        }
-        if (matches.length >= 10) break;
+  try {
+    const res = await fetch(
+      "https://csgo-matches-and-tournaments.p.rapidapi.com/matches?page=1&limit=20",
+      {
+        headers: {
+          "x-rapidapi-host": "csgo-matches-and-tournaments.p.rapidapi.com",
+          "x-rapidapi-key": RAPIDAPI_KEY,
+          "Content-Type": "application/json",
+        },
       }
-    }
-  }
-
-  return matches;
-}
-
-// Fetch team badges from TheSportsDB
-async function enrichWithBadges(matches: any[]): Promise<any[]> {
-  const teamBadgeCache: Record<string, string> = {};
-  
-  // Collect unique team names
-  const teamNames = new Set<string>();
-  matches.forEach(m => { teamNames.add(m.team1); teamNames.add(m.team2); });
-  
-  // Fetch badges in parallel (limited)
-  const batchSize = 5;
-  const names = Array.from(teamNames);
-  
-  for (let i = 0; i < Math.min(names.length, batchSize * 2); i += batchSize) {
-    const batch = names.slice(i, i + batchSize);
-    await Promise.all(batch.map(async (name) => {
-      try {
-        const res = await fetch(
-          `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(name)}`,
-          { signal: AbortSignal.timeout(3000) }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (data.teams?.[0]?.strBadge) {
-            teamBadgeCache[name] = data.teams[0].strBadge;
-          }
-        }
-      } catch { /* skip */ }
-    }));
-  }
-
-  return matches.map(m => ({
-    ...m,
-    team1Badge: teamBadgeCache[m.team1] || null,
-    team2Badge: teamBadgeCache[m.team2] || null,
-  }));
-}
-
-// Fetch from TheSportsDB CS2 leagues
-async function fetchFromSportsDB(): Promise<any[]> {
-  try {
-    // ESL Pro League (5425), Blast Premier (5426)
-    const leagueIds = ["5425", "5426"];
-    const allEvents: any[] = [];
-
-    await Promise.all(leagueIds.map(async (lid) => {
-      try {
-        const res = await fetch(
-          `https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=${lid}`,
-          { signal: AbortSignal.timeout(5000) }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (data.events) {
-            allEvents.push(...data.events);
-          }
-        }
-      } catch { /* skip */ }
-    }));
-
-    return allEvents.map((e, i) => ({
-      id: `sdb-${i}`,
-      team1: e.strHomeTeam || e.strEvent?.split(" vs ")?.[0] || "TBD",
-      team2: e.strAwayTeam || e.strEvent?.split(" vs ")?.[1] || "TBD",
-      event: e.strLeague || "CS2 Event",
-      time: e.strTime ? `${e.strTime.substring(0, 5)} CET` : "TBD",
-      format: "Bo3",
-      rank1: 0,
-      rank2: 0,
-      team1Badge: e.strHomeTeamBadge || null,
-      team2Badge: e.strAwayTeamBadge || null,
-    }));
-  } catch (err) {
-    console.error("TheSportsDB error:", err);
-    return [];
-  }
-}
-
-// Firecrawl fallback
-async function fetchViaFirecrawl(apiKey: string): Promise<any[]> {
-  try {
-    const res = await fetch("https://api.firecrawl.dev/v1/search", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: "HLTV upcoming CS2 matches today 2026 site:hltv.org",
-        limit: 3,
-        scrapeOptions: { formats: ["markdown"] },
-      }),
-    });
+    );
 
     if (!res.ok) {
-      console.error("Firecrawl search failed:", res.status);
+      console.error("RapidAPI error:", res.status, await res.text());
       return [];
     }
 
     const data = await res.json();
-    const results = data.data || data.results || [];
-    const combined = results
-      .map((r: any) => (r.markdown || r.description || "").substring(0, 4000))
-      .filter(Boolean)
-      .join("\n\n");
+    console.log("RapidAPI raw response keys:", Object.keys(data));
 
-    if (combined.length < 50) return [];
+    // Handle different possible response shapes
+    const matchList = Array.isArray(data) ? data : data.matches || data.data || data.results || [];
 
-    // Try AI extraction if available
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) return [];
-
-    return await extractMatchesWithAI(LOVABLE_API_KEY, combined);
-  } catch (err) {
-    console.error("Firecrawl error:", err);
-    return [];
-  }
-}
-
-async function extractMatchesWithAI(apiKey: string, scrapedContent: string) {
-  try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content: `Extract upcoming CS2 match data. Return ONLY valid JSON array.
-Each match: { "id": "unique-id", "team1": "Team Name", "team2": "Team Name", "event": "Tournament", "time": "HH:MM CET", "format": "Bo1|Bo3|Bo5", "rank1": number, "rank2": number }
-Return 4-12 matches. Only CS2 matches.`,
-          },
-          {
-            role: "user",
-            content: `Extract CS2 matches:\n\n${scrapedContent.substring(0, 10000)}`,
-          },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
-      if (response.status === 402 || response.status === 429) {
-        console.error(`AI gateway: ${response.status}`);
-        return [];
-      }
+    if (!Array.isArray(matchList) || matchList.length === 0) {
+      console.log("No matches in RapidAPI response");
       return [];
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
-    const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    const matches = JSON.parse(cleaned);
-    if (!Array.isArray(matches)) return [];
+    console.log("First match sample:", JSON.stringify(matchList[0]).substring(0, 500));
 
-    return matches.map((m: any, i: number) => ({
-      id: m.id || `ai-${i}`,
-      team1: m.team1 || "TBD",
-      team2: m.team2 || "TBD",
-      event: m.event || "CS2 Tournament",
-      time: m.time || "TBD",
-      format: m.format || "Bo3",
-      rank1: m.rank1 || 0,
-      rank2: m.rank2 || 0,
-    }));
+    return matchList.map((m: any, i: number) => {
+      // Extract team names from various possible structures
+      const team1 = m.team1?.name || m.teams?.[0]?.name || m.home_team?.name || m.homeTeam || m.team1_name || "TBD";
+      const team2 = m.team2?.name || m.teams?.[1]?.name || m.away_team?.name || m.awayTeam || m.team2_name || "TBD";
+      
+      // Extract event/tournament
+      const event = m.tournament?.name || m.event?.name || m.league?.name || m.tournament_name || m.event_name || "CS2 Match";
+      
+      // Extract time
+      let time = "TBD";
+      const timestamp = m.date || m.start_time || m.scheduled_at || m.begin_at || m.startTime || m.timestamp;
+      if (timestamp) {
+        try {
+          const d = new Date(timestamp);
+          if (!isNaN(d.getTime())) {
+            time = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")} CET`;
+          }
+        } catch { /* keep TBD */ }
+      }
+
+      // Extract format
+      const format = m.format || m.match_type || m.bestOf ? `Bo${m.bestOf || m.best_of || 3}` : (m.number_of_games ? `Bo${m.number_of_games}` : "Bo3");
+
+      // Extract scores if available
+      const score1 = m.team1?.score ?? m.teams?.[0]?.score ?? m.score1 ?? m.home_score ?? null;
+      const score2 = m.team2?.score ?? m.teams?.[1]?.score ?? m.score2 ?? m.away_score ?? null;
+
+      // Extract status
+      const status = m.status || m.state || m.match_status || "";
+
+      // Extract team logos
+      const team1Logo = m.team1?.logo || m.teams?.[0]?.logo || m.team1?.image_url || null;
+      const team2Logo = m.team2?.logo || m.teams?.[1]?.logo || m.team2?.image_url || null;
+
+      return {
+        id: m.id?.toString() || m._id || `rapid-${i}`,
+        team1,
+        team2,
+        event,
+        time,
+        format: typeof format === "string" ? format : "Bo3",
+        rank1: m.team1?.ranking || m.teams?.[0]?.ranking || 0,
+        rank2: m.team2?.ranking || m.teams?.[1]?.ranking || 0,
+        score1,
+        score2,
+        status,
+        team1Badge: team1Logo,
+        team2Badge: team2Logo,
+      };
+    }).filter((m: any) => m.team1 !== "TBD" && m.team2 !== "TBD");
   } catch (err) {
-    console.error("AI extraction error:", err);
+    console.error("RapidAPI fetch error:", err);
     return [];
   }
 }
 
 function getFallbackMatches() {
-  // Updated fallback with current 2026 tournaments
   return [
     { id: "1", team1: "Natus Vincere", team2: "Team Vitality", event: "PGL Major Berlin 2026", time: "15:00 CET", format: "Bo3", rank1: 1, rank2: 2 },
     { id: "2", team1: "G2 Esports", team2: "FaZe Clan", event: "IEM Katowice 2026", time: "17:30 CET", format: "Bo3", rank1: 3, rank2: 4 },

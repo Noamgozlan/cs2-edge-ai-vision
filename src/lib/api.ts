@@ -9,6 +9,9 @@ export interface Match {
   format: string;
   rank1: number;
   rank2: number;
+  score1?: number | null;
+  score2?: number | null;
+  status?: string;
   team1Badge?: string | null;
   team2Badge?: string | null;
 }
