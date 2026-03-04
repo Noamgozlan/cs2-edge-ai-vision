@@ -10,6 +10,9 @@ import { motion } from "framer-motion";
 import { TeamLogo } from "@/lib/team-logos";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import MapBreakdown from "@/components/dashboard/MapBreakdown";
+import PlayerFormHeatmap from "@/components/dashboard/PlayerFormHeatmap";
+import PreMatchCountdown from "@/components/dashboard/PreMatchCountdown";
 import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -305,6 +308,9 @@ const MatchDetail = () => {
 
             {/* Veto + Edge Insight - 2 cols */}
             <div className="lg:col-span-2 space-y-4">
+              {/* Pre-Match Countdown */}
+              <PreMatchCountdown matchTime={time} team1={team1} team2={team2} event={event} format={format} />
+
               {/* Predicted Veto */}
               <div className="rounded-2xl border border-border bg-card p-5">
                 <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
@@ -403,7 +409,16 @@ const MatchDetail = () => {
             </div>
           )}
 
-          {/* Probability Trajectory */}
+          {/* Map-by-Map Breakdown */}
+          {analysis.mapBreakdown && analysis.mapBreakdown.length > 0 && (
+            <MapBreakdown maps={analysis.mapBreakdown} team1={team1} team2={team2} />
+          )}
+
+          {/* Player Form Heatmap */}
+          {analysis.playerForm && analysis.playerForm.length > 0 && (
+            <PlayerFormHeatmap players={analysis.playerForm} team1={team1} team2={team2} />
+          )}
+
           {trajectoryData.length > 0 && (
             <div>
               <h2 className="text-xl font-black mb-4">Probability Trajectory</h2>

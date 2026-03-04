@@ -137,6 +137,32 @@ JSON structure:
     { "action": "pick", "team": "Team2", "map": "MapName" },
     { "action": "decider", "team": "Decider", "map": "MapName" }
   ],
+  "mapBreakdown": [
+    {
+      "map": "Mirage",
+      "team1WinRate": 62,
+      "team2WinRate": 48,
+      "team1CtWinPct": 58,
+      "team1TWinPct": 42,
+      "team2CtWinPct": 55,
+      "team2TWinPct": 45,
+      "team1PistolWinPct": 60,
+      "team2PistolWinPct": 45,
+      "totalRoundsAvg": 25.4,
+      "edge": "Team1 favored - strong CT side"
+    }
+  ],
+  "playerForm": [
+    {
+      "name": "PlayerName",
+      "team": "Team1",
+      "recentRatings": [1.15, 1.02, 0.98, 1.22, 1.08, 0.95, 1.18, 1.05, 1.12, 0.99],
+      "trend": "stable | rising | declining",
+      "avgKills": 21.5,
+      "clutchRate": "12%",
+      "openingDuelWinRate": "55%"
+    }
+  ],
   "analysis": {
     "summary": "2-3 sentences referencing REAL stats from the scraped data",
     "sections": [
@@ -159,7 +185,9 @@ JSON structure:
 }
 
 Provide 2-4 alternative bets of DIFFERENT types. Include at least one player prop.
-Use REAL player names. If you have scraped data, mark dataSource as "live", otherwise "training".`;
+Use REAL player names. If you have scraped data, mark dataSource as "live", otherwise "training".
+Include mapBreakdown with 3-5 maps showing CT/T side splits, pistol round rates, and total rounds averages.
+Include playerForm with 3-5 key players per team showing their last 10 match ratings as an array, trend direction, avg kills, clutch rate, and opening duel win rate.`;
 
     const userPrompt = `Find the SMARTEST bet for this CS2 match:
 
