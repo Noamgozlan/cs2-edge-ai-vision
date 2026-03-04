@@ -4,11 +4,13 @@ import { fetchAIAnalysis, type MatchAnalysis, type AlternativeBet } from "@/lib/
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   ArrowLeft, Loader2, Zap, TrendingUp, Shield, Swords,
-  Users, History, Lock
+  Users, History, Lock, BookmarkPlus, Database
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { TeamLogo } from "@/lib/team-logos";
 import { useState, useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell
@@ -160,11 +162,42 @@ const MatchDetail = () => {
               </span>
             </div>
             <p className="text-2xl font-black">{analysis.prediction.recommendedBet}</p>
-            <div className="flex items-center gap-4 mt-3">
-              <span className="text-sm font-bold text-primary">{analysis.prediction.confidence}% confidence</span>
-              <span className="text-xs text-muted-foreground">
-                Win Prob: {team1} {analysis.prediction.winProbability.team1}% — {team2} {analysis.prediction.winProbability.team2}%
-              </span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-bold text-primary">{analysis.prediction.confidence}% confidence</span>
+                <span className="text-xs text-muted-foreground">
+                  Win Prob: {team1} {analysis.prediction.winProbability.team1}% — {team2} {analysis.prediction.winProbability.team2}%
+                </span>
+                {analysis.dataSource === "live" && (
+                  <span className="flex items-center gap-1 text-[9px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+                    <Database className="w-3 h-3" /> LIVE DATA
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={async () => {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (!user) { toast.error("Login required"); return; }
+                  const { error } = await supabase.from("prediction_tracking" as any).insert({
+                    user_id: user.id,
+                    match_id: id || "unknown",
+                    team1, team2,
+                    event,
+                    recommended_bet: analysis.prediction.recommendedBet,
+                    bet_type: analysis.prediction.betType || "match_winner",
+                    confidence: analysis.prediction.confidence,
+                    ai_pick: analysis.prediction.recommendedBet,
+                    data_source: analysis.dataSource || "training",
+                    odds_at_prediction: 1.80,
+                    stake: 100,
+                  } as any);
+                  if (error) { toast.error("Failed to track prediction"); console.error(error); }
+                  else toast.success("Prediction tracked! View in Bet Tracker.");
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 sm:ml-auto"
+              >
+                <BookmarkPlus className="w-3.5 h-3.5" /> Track Prediction
+              </button>
             </div>
           </div>
 

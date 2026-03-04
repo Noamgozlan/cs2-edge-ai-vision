@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.ai-analysis]
 verify_jwt = false
+
+[functions.scrape-hltv]
+verify_jwt = false
