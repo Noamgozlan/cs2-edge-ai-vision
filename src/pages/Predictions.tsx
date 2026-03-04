@@ -8,7 +8,7 @@ import { Loader2, Lock, Crown } from "lucide-react";
 import { useState } from "react";
 
 const Predictions = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isPro, openCheckout } = useSubscription();
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
   const FREE_LIMIT = 3;
@@ -22,13 +22,12 @@ const Predictions = () => {
 
   // Fetch AI predictions for each match
   const { data: predictions, isLoading: predictionsLoading } = useQuery({
-    queryKey: ["predictions-batch", matches?.map(m => `${m.team1}-${m.team2}`)],
+    queryKey: ["predictions-batch", matches?.map(m => `${m.team1}-${m.team2}`), language],
     queryFn: async () => {
       if (!matches) return [];
-      // Fetch predictions for first 6 matches
       const results = await Promise.allSettled(
         matches.slice(0, 6).map(m =>
-          fetchAIAnalysis(m.team1, m.team2, m.event, m.format)
+          fetchAIAnalysis(m.team1, m.team2, m.event, m.format, language)
             .then(analysis => ({
               match: `${m.team1} vs ${m.team2}`,
               bet: analysis.prediction.recommendedBet,

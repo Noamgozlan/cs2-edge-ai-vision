@@ -72,14 +72,24 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { team1, team2, event, format } = await req.json();
+    const { team1, team2, event, format, language } = await req.json();
+    const lang = language || "en";
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     // Scrape real data from HLTV via Firecrawl
     const realData = await scrapeHLTVData(team1, team2);
 
+    const languageMap: Record<string, string> = {
+      en: "English", he: "Hebrew", ar: "Arabic", es: "Spanish", fr: "French",
+      de: "German", pt: "Portuguese", ru: "Russian", zh: "Chinese", ja: "Japanese",
+      ko: "Korean", tr: "Turkish",
+    };
+    const outputLanguage = languageMap[lang] || "English";
+
     const systemPrompt = `You are an elite CS2 esports betting analyst. You find the SMARTEST, highest-value bets across ALL available markets — not just match winner.
+
+CRITICAL: ALL text output (analysis summaries, section titles, section content, recommended bet descriptions, alternative bet reasoning, betting edge explanations) MUST be written in ${outputLanguage}. Keep team names, player names, map names, and statistical values in their original form. Only translate descriptive text.
 
 ${realData ? `IMPORTANT: You have been given REAL, LIVE scraped data from HLTV and other sources below. Use this REAL data as the foundation of your analysis. Reference actual stats, actual recent results, actual player ratings from the data. Do NOT make up stats — if the data doesn't cover something, say so.
 

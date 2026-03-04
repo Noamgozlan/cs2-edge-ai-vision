@@ -74,10 +74,11 @@ export async function fetchAIAnalysis(
   team1: string,
   team2: string,
   event?: string,
-  format?: string
+  format?: string,
+  language?: string
 ): Promise<MatchAnalysis> {
   const { data, error } = await supabase.functions.invoke("ai-analysis", {
-    body: { team1, team2, event, format },
+    body: { team1, team2, event, format, language: language || "en" },
   });
   if (error) {
     console.error("Error fetching AI analysis:", error);

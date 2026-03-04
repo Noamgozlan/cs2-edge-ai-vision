@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMatches, fetchAIAnalysis, Match, AlternativeBet } from "@/lib/api";
@@ -29,6 +30,7 @@ const STARTING_BALANCE = 10000;
 const DEFAULT_STAKE = 100;
 
 const DemoBetting = () => {
+  const { language } = useLanguage();
   const queryClient = useQueryClient();
   const [expandedMatch, setExpandedMatch] = useState<string | null>(null);
   const [stakes, setStakes] = useState<Record<string, number>>({});
@@ -270,6 +272,7 @@ const DemoBetting = () => {
                       <BettingPanel
                         match={m}
                         stake={stake}
+                        language={language}
                         onStakeChange={(v) => setStakes(prev => ({ ...prev, [m.id]: v }))}
                         onBet={(teamPicked, odds) => {
                           placeBet.mutate({ match: m, teamPicked, odds, stake });
@@ -379,17 +382,18 @@ function StatCard({ icon, label, value, trend }: {
   );
 }
 
-function BettingPanel({ match, stake, onStakeChange, onBet, disabled }: {
+function BettingPanel({ match, stake, language, onStakeChange, onBet, disabled }: {
   match: Match;
   stake: number;
+  language: string;
   onStakeChange: (v: number) => void;
   onBet: (team: string, odds: number) => void;
   disabled: boolean;
 }) {
   const { data, isLoading } = useQuery({
-    queryKey: ["odds-quick", match.team1, match.team2],
+    queryKey: ["odds-quick", match.team1, match.team2, language],
     queryFn: async () => {
-      const analysis = await fetchAIAnalysis(match.team1, match.team2, match.event, match.format);
+      const analysis = await fetchAIAnalysis(match.team1, match.team2, match.event, match.format, language);
       const p = analysis.prediction;
       const odds1 = p.winProbability.team1 > 0 ? +(100 / p.winProbability.team1).toFixed(2) : 2.0;
       const odds2 = p.winProbability.team2 > 0 ? +(100 / p.winProbability.team2).toFixed(2) : 2.0;
