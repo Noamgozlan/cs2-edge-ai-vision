@@ -5,261 +5,169 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const GRID_GRAPHQL_URL = "https://api-op.grid.gg/central-data/graphql";
+const BASE_URL = "https://api.balldontlie.io/cs/v1";
+const CACHE_TTL_MS = 30_000;
+
+let cache: { data: any; ts: number } | null = null;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const matches = await fetchFromGRID();
-    if (matches.length > 0) {
-      console.log(`Fetched ${matches.length} matches from GRID`);
-      return jsonResponse(matches);
+    // Return cached data if fresh
+    if (cache && Date.now() - cache.ts < CACHE_TTL_MS) {
+      console.log("Returning cached data");
+      return jsonResponse(cache.data);
     }
 
-    console.log("GRID returned no matches, using fallback");
-    return jsonResponse(getFallbackMatches());
+    const API_KEY = Deno.env.get("BALLDONTLIE_API_KEY");
+    if (!API_KEY) {
+      console.error("BALLDONTLIE_API_KEY not configured");
+      return jsonResponse(getFallbackMatches());
+    }
+
+    // Fetch matches and tournaments in parallel
+    const [matchesData, tournamentsData, teamsData] = await Promise.all([
+      fetchWithRetry(`${BASE_URL}/matches?per_page=50`, API_KEY),
+      fetchWithRetry(`${BASE_URL}/tournaments?per_page=25`, API_KEY),
+      fetchWithRetry(`${BASE_URL}/teams?per_page=100`, API_KEY),
+    ]);
+
+    const tournamentMap = new Map<number, string>();
+    if (tournamentsData?.data) {
+      for (const t of tournamentsData.data) {
+        tournamentMap.set(t.id, t.name);
+      }
+    }
+
+    const teamMap = new Map<number, any>();
+    if (teamsData?.data) {
+      for (const t of teamsData.data) {
+        teamMap.set(t.id, t);
+      }
+    }
+
+    let matches: any[] = [];
+
+    if (matchesData?.data && Array.isArray(matchesData.data)) {
+      matches = matchesData.data.map((m: any) => normalizeMatch(m, tournamentMap, teamMap));
+      console.log(`Fetched ${matches.length} matches from BallDontLie`);
+    } else {
+      console.log("No match data from BallDontLie, building from tournaments/teams");
+      // If matches endpoint is not available (tier restriction), use fallback
+      matches = getFallbackMatches();
+    }
+
+    const result = {
+      matches,
+      tournaments: tournamentsData?.data || [],
+      teams: teamsData?.data || [],
+    };
+
+    cache = { data: result, ts: Date.now() };
+    return jsonResponse(result);
   } catch (error) {
     console.error("Error:", error);
-    return jsonResponse(getFallbackMatches());
+    return jsonResponse({ matches: getFallbackMatches(), tournaments: [], teams: [] });
   }
 });
 
-function jsonResponse(matches: any[]) {
-  return new Response(JSON.stringify({ matches }), {
+function jsonResponse(data: any) {
+  return new Response(JSON.stringify(data.matches ? data : { matches: data }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
 
-async function fetchFromGRID(): Promise<any[]> {
-  const GRID_API_KEY = Deno.env.get("GRID_API_KEY");
-  if (!GRID_API_KEY) {
-    console.error("GRID_API_KEY not configured");
-    return [];
+async function fetchWithRetry(url: string, apiKey: string, retries = 3): Promise<any> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: apiKey },
+      });
+
+      if (res.status === 429) {
+        const wait = Math.min(1000 * attempt, 3000);
+        console.log(`Rate limited, waiting ${wait}ms (attempt ${attempt})`);
+        await new Promise((r) => setTimeout(r, wait));
+        continue;
+      }
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error(`API error ${res.status} for ${url}: ${errText}`);
+        if (attempt === retries) return null;
+        continue;
+      }
+
+      return await res.json();
+    } catch (err) {
+      console.error(`Fetch error attempt ${attempt} for ${url}:`, err);
+      if (attempt === retries) return null;
+      await new Promise((r) => setTimeout(r, 500 * attempt));
+    }
   }
-
-  // Query upcoming and recent CS2 series
-  const query = `
-    query GetCS2Series {
-      series(
-        filter: {
-          titleIds: [29]
-          types: [BEST_OF_1, BEST_OF_2, BEST_OF_3, BEST_OF_5]
-        }
-        first: 20
-        orderBy: StartTimeScheduled
-        orderDirection: DESC
-      ) {
-        edges {
-          node {
-            id
-            type
-            format {
-              value
-            }
-            startTimeScheduled
-            state
-            tournament {
-              name
-            }
-            teams {
-              baseInfo {
-                name
-                logoUrl
-              }
-              score
-              won
-            }
-          }
-        }
-      }
-    }
-  `;
-
-  try {
-    const res = await fetch(GRID_GRAPHQL_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": GRID_API_KEY,
-      },
-      body: JSON.stringify({ query }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("GRID API error:", res.status, errText);
-
-      // If the schema doesn't match, try a simpler query
-      if (res.status === 400) {
-        return await fetchFromGRIDSimple(GRID_API_KEY);
-      }
-      return [];
-    }
-
-    const json = await res.json();
-    console.log("GRID response keys:", JSON.stringify(Object.keys(json)));
-
-    if (json.errors) {
-      console.error("GRID GraphQL errors:", JSON.stringify(json.errors));
-      // Try simpler query on schema errors
-      return await fetchFromGRIDSimple(GRID_API_KEY);
-    }
-
-    const edges = json.data?.series?.edges || [];
-    if (edges.length === 0) {
-      console.log("No series in GRID response, trying simple query");
-      return await fetchFromGRIDSimple(GRID_API_KEY);
-    }
-
-    return edges.map((edge: any, i: number) => {
-      const s = edge.node;
-      const teams = s.teams || [];
-      const team1 = teams[0]?.baseInfo?.name || "TBD";
-      const team2 = teams[1]?.baseInfo?.name || "TBD";
-      const team1Logo = teams[0]?.baseInfo?.logoUrl || null;
-      const team2Logo = teams[1]?.baseInfo?.logoUrl || null;
-      const score1 = teams[0]?.score ?? null;
-      const score2 = teams[1]?.score ?? null;
-
-      let time = "TBD";
-      if (s.startTimeScheduled) {
-        try {
-          const d = new Date(s.startTimeScheduled);
-          if (!isNaN(d.getTime())) {
-            time = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")} CET`;
-          }
-        } catch { /* keep TBD */ }
-      }
-
-      const formatMap: Record<string, string> = {
-        BEST_OF_1: "Bo1",
-        BEST_OF_2: "Bo2",
-        BEST_OF_3: "Bo3",
-        BEST_OF_5: "Bo5",
-      };
-      const format = formatMap[s.type] || s.format?.value || "Bo3";
-
-      const stateMap: Record<string, string> = {
-        SCHEDULED: "upcoming",
-        STARTED: "live",
-        FINISHED: "finished",
-      };
-      const status = stateMap[s.state] || s.state || "upcoming";
-
-      return {
-        id: s.id?.toString() || `grid-${i}`,
-        team1,
-        team2,
-        event: s.tournament?.name || "CS2 Tournament",
-        time,
-        format,
-        rank1: 0,
-        rank2: 0,
-        score1,
-        score2,
-        status,
-        team1Badge: team1Logo,
-        team2Badge: team2Logo,
-      };
-    }).filter((m: any) => m.team1 !== "TBD" && m.team2 !== "TBD");
-  } catch (err) {
-    console.error("GRID fetch error:", err);
-    return [];
-  }
+  return null;
 }
 
-// Fallback simpler query if the schema differs
-async function fetchFromGRIDSimple(apiKey: string): Promise<any[]> {
-  const query = `
-    {
-      series(first: 20) {
-        edges {
-          node {
-            id
-            type
-            startTimeScheduled
-            state
-            tournament {
-              name
-            }
-            teams {
-              baseInfo {
-                name
-                logoUrl
-              }
-              score
-            }
-          }
-        }
-      }
-    }
-  `;
+function normalizeMatch(m: any, tournamentMap: Map<number, string>, teamMap: Map<number, any>): any {
+  const team1Info = m.team_1 || m.home_team || {};
+  const team2Info = m.team_2 || m.away_team || {};
 
-  try {
-    const res = await fetch(GRID_GRAPHQL_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-      },
-      body: JSON.stringify({ query }),
-    });
+  const team1Name = team1Info.name || teamMap.get(team1Info.id)?.name || "TBD";
+  const team2Name = team2Info.name || teamMap.get(team2Info.id)?.name || "TBD";
+  const team1Logo = team1Info.logo_url || team1Info.image_url || teamMap.get(team1Info.id)?.logo_url || null;
+  const team2Logo = team2Info.logo_url || team2Info.image_url || teamMap.get(team2Info.id)?.logo_url || null;
 
-    if (!res.ok) {
-      console.error("GRID simple query error:", res.status, await res.text());
-      return [];
-    }
+  const tournamentName = m.tournament?.name || tournamentMap.get(m.tournament_id) || "CS2 Tournament";
 
-    const json = await res.json();
-    if (json.errors) {
-      console.error("GRID simple query GraphQL errors:", JSON.stringify(json.errors));
-      return [];
-    }
-
-    const edges = json.data?.series?.edges || [];
-    console.log(`GRID simple query returned ${edges.length} series`);
-
-    return edges.map((edge: any, i: number) => {
-      const s = edge.node;
-      const teams = s.teams || [];
-      const team1 = teams[0]?.baseInfo?.name || "TBD";
-      const team2 = teams[1]?.baseInfo?.name || "TBD";
-
-      let time = "TBD";
-      if (s.startTimeScheduled) {
-        try {
-          const d = new Date(s.startTimeScheduled);
-          if (!isNaN(d.getTime())) {
-            time = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")} CET`;
-          }
-        } catch { /* keep TBD */ }
-      }
-
-      const formatMap: Record<string, string> = {
-        BEST_OF_1: "Bo1", BEST_OF_2: "Bo2", BEST_OF_3: "Bo3", BEST_OF_5: "Bo5",
-      };
-
-      return {
-        id: s.id?.toString() || `grid-${i}`,
-        team1,
-        team2,
-        event: s.tournament?.name || "CS2 Tournament",
-        time,
-        format: formatMap[s.type] || "Bo3",
-        rank1: 0,
-        rank2: 0,
-        score1: teams[0]?.score ?? null,
-        score2: teams[1]?.score ?? null,
-        status: s.state === "STARTED" ? "live" : s.state === "FINISHED" ? "finished" : "upcoming",
-        team1Badge: teams[0]?.baseInfo?.logoUrl || null,
-        team2Badge: teams[1]?.baseInfo?.logoUrl || null,
-      };
-    }).filter((m: any) => m.team1 !== "TBD" && m.team2 !== "TBD");
-  } catch (err) {
-    console.error("GRID simple fetch error:", err);
-    return [];
+  // Determine status
+  let status = "upcoming";
+  const rawStatus = (m.status || "").toLowerCase();
+  if (rawStatus.includes("live") || rawStatus.includes("started") || rawStatus.includes("in_progress") || rawStatus === "running") {
+    status = "live";
+  } else if (rawStatus.includes("finished") || rawStatus.includes("completed") || rawStatus.includes("ended")) {
+    status = "finished";
   }
+
+  // Format
+  const formatMap: Record<string, string> = {
+    bo1: "Bo1", bo3: "Bo3", bo5: "Bo5",
+    best_of_1: "Bo1", best_of_3: "Bo3", best_of_5: "Bo5",
+  };
+  const rawFormat = (m.format || m.best_of || "").toString().toLowerCase();
+  const format = formatMap[rawFormat] || (rawFormat === "1" ? "Bo1" : rawFormat === "3" ? "Bo3" : rawFormat === "5" ? "Bo5" : "Bo3");
+
+  // Time in UTC
+  let time = "TBD";
+  if (m.start_time || m.scheduled_at || m.begin_at) {
+    try {
+      const d = new Date(m.start_time || m.scheduled_at || m.begin_at);
+      if (!isNaN(d.getTime())) {
+        time = d.toISOString();
+      }
+    } catch { /* keep TBD */ }
+  }
+
+  return {
+    id: m.id?.toString() || `bdl-${Math.random().toString(36).slice(2)}`,
+    match_id: m.id,
+    team1: team1Name,
+    team2: team2Name,
+    event: tournamentName,
+    time,
+    start_time: time,
+    format,
+    match_status: status,
+    status,
+    rank1: team1Info.ranking || team1Info.rank || 0,
+    rank2: team2Info.ranking || team2Info.rank || 0,
+    score1: m.team_1_score ?? m.score?.team_1 ?? null,
+    score2: m.team_2_score ?? m.score?.team_2 ?? null,
+    current_score: m.team_1_score != null ? `${m.team_1_score}-${m.team_2_score}` : null,
+    map: m.current_map || m.map || null,
+    team1Badge: team1Logo,
+    team2Badge: team2Logo,
+  };
 }
 
 function getFallbackMatches() {
