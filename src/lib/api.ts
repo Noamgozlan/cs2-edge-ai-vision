@@ -45,6 +45,7 @@ export interface MatchAnalysis {
     betType?: string;
     confidence: number;
     winProbability: { team1: number; team2: number };
+    expectedValue?: string;
   };
   alternativeBets?: AlternativeBet[];
   veto: VetoStep[];
@@ -57,6 +58,7 @@ export interface MatchAnalysis {
     team2: Record<string, string>;
   };
   playerStats: PlayerStat[];
+  dataSource?: "live" | "training";
 }
 
 export async function fetchMatches(): Promise<Match[]> {

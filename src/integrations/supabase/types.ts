@@ -59,6 +59,63 @@ export type Database = {
         }
         Relationships: []
       }
+      prediction_tracking: {
+        Row: {
+          actual_result: string | null
+          ai_pick: string
+          bet_type: string
+          confidence: number
+          created_at: string
+          data_source: string
+          event: string
+          id: string
+          match_id: string
+          odds_at_prediction: number
+          payout: number
+          recommended_bet: string
+          stake: number
+          team1: string
+          team2: string
+          user_id: string
+        }
+        Insert: {
+          actual_result?: string | null
+          ai_pick: string
+          bet_type?: string
+          confidence?: number
+          created_at?: string
+          data_source?: string
+          event?: string
+          id?: string
+          match_id: string
+          odds_at_prediction?: number
+          payout?: number
+          recommended_bet: string
+          stake?: number
+          team1: string
+          team2: string
+          user_id: string
+        }
+        Update: {
+          actual_result?: string | null
+          ai_pick?: string
+          bet_type?: string
+          confidence?: number
+          created_at?: string
+          data_source?: string
+          event?: string
+          id?: string
+          match_id?: string
+          odds_at_prediction?: number
+          payout?: number
+          recommended_bet?: string
+          stake?: number
+          team1?: string
+          team2?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
