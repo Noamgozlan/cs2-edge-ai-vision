@@ -1,0 +1,7 @@
+project_id = "fzweiksnzvevgxtodobs"
+
+[functions.fetch-matches]
+verify_jwt = false
+
+[functions.ai-analysis]
+verify_jwt = false
