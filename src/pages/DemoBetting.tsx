@@ -6,9 +6,10 @@ import { TeamLogo } from "@/lib/team-logos";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Loader2, TrendingUp, TrendingDown, DollarSign, Target,
-  Trophy, Trash2, ChevronDown, Zap, CircleDot
+  Trophy, Trash2, ChevronDown, Zap, CircleDot, FlaskConical
 } from "lucide-react";
 import { toast } from "sonner";
+import BettingSimulation from "@/components/dashboard/BettingSimulation";
 
 interface DemoBet {
   id: string;
@@ -31,6 +32,7 @@ const DemoBetting = () => {
   const queryClient = useQueryClient();
   const [expandedMatch, setExpandedMatch] = useState<string | null>(null);
   const [stakes, setStakes] = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab] = useState<"bets" | "simulation">("bets");
 
   // Fetch matches
   const { data: matches, isLoading: matchesLoading } = useQuery({
@@ -143,12 +145,48 @@ const DemoBetting = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-black tracking-tight">Demo Betting</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Virtual betting to track how profitable the AI system is. Starting balance: ${STARTING_BALANCE.toLocaleString()}
-        </p>
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight">Demo Betting</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Virtual betting to track how profitable the AI system is. Starting balance: ${STARTING_BALANCE.toLocaleString()}
+          </p>
+        </div>
       </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 border-b border-border">
+        <button
+          onClick={() => setActiveTab("bets")}
+          className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === "bets"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <DollarSign className="w-4 h-4" /> Place Bets
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab("simulation")}
+          className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === "simulation"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <FlaskConical className="w-4 h-4" /> Simulation
+          </span>
+        </button>
+      </div>
+
+      {activeTab === "simulation" ? (
+        <BettingSimulation />
+      ) : (
+        <>
+
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -307,6 +345,8 @@ const DemoBetting = () => {
             ))}
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
