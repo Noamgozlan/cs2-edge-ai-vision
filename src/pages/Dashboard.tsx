@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMatches, fetchAIAnalysis, Match } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { useState, useMemo } from "react";
+import { TeamLogo } from "@/lib/team-logos";
 
 const container = {
   hidden: { opacity: 0 },
@@ -155,16 +156,12 @@ const Dashboard = () => {
                     >
                       <div className="flex items-center gap-5">
                         <div className="flex items-center gap-3 w-56">
-                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-[10px] font-black text-muted-foreground">
-                            #{m.rank1}
-                          </div>
+                          <TeamLogo name={m.team1} size={28} />
                           <span className="font-semibold text-sm truncate">{m.team1}</span>
                         </div>
                         <span className="text-[10px] font-black text-muted-foreground tracking-widest">VS</span>
                         <div className="flex items-center gap-3 w-56">
-                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-[10px] font-black text-muted-foreground">
-                            #{m.rank2}
-                          </div>
+                          <TeamLogo name={m.team2} size={28} />
                           <span className="font-semibold text-sm truncate">{m.team2}</span>
                         </div>
                       </div>
