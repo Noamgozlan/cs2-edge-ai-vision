@@ -123,7 +123,7 @@ const MatchOddsCard = ({ match, odds, prediction, loading, error }: MatchOdds) =
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-border overflow-x-auto">
+      <div className="flex items-center gap-1 border-b border-border overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {TABS.map((tab, i) => (
           <button
             key={tab}
@@ -384,7 +384,7 @@ const OddsComparison = () => {
   return (
     <div className="space-y-6">
       {/* Match Selector */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {matches.slice(0, 8).map((m, i) => (
           <button
             key={m.id}
