@@ -38,7 +38,8 @@ const DemoBetting = () => {
   const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ["matches"],
     queryFn: fetchMatches,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 3 * 60 * 1000,
   });
 
   // Fetch user's demo bets

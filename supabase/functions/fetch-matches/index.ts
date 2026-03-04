@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -10,95 +9,150 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Fetch upcoming matches from HLTV
-    const hltvResponse = await fetch("https://www.hltv.org/matches", {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml",
-        "Accept-Language": "en-US,en;q=0.9",
-      },
-    });
+    const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
-    if (!hltvResponse.ok) {
-      console.error("HLTV fetch failed:", hltvResponse.status);
-      // Return curated real data as fallback
-      return new Response(JSON.stringify({ matches: getFallbackMatches() }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!FIRECRAWL_API_KEY) {
+      console.log("No FIRECRAWL_API_KEY, using fallback");
+      return jsonResponse(getFallbackMatches());
     }
 
-    const html = await hltvResponse.text();
-    const matches = parseMatchesFromHtml(html);
+    // Use Firecrawl to search for real upcoming CS2 matches
+    const [hltvResults, dustResults] = await Promise.all([
+      firecrawlSearch(FIRECRAWL_API_KEY, "HLTV upcoming CS2 matches today 2026 site:hltv.org", 3),
+      firecrawlSearch(FIRECRAWL_API_KEY, "CS2 matches schedule today results 2026", 2),
+    ]);
+
+    const combined = [...hltvResults, ...dustResults].join("\n\n");
+    console.log(`Scraped ${combined.length} chars of match data`);
+
+    if (combined.length < 50) {
+      console.log("Insufficient scraped data, using fallback");
+      return jsonResponse(getFallbackMatches());
+    }
+
+    // Use Lovable AI to extract structured match data from scraped content
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.log("No LOVABLE_API_KEY, using fallback");
+      return jsonResponse(getFallbackMatches());
+    }
+
+    const matches = await extractMatchesWithAI(LOVABLE_API_KEY, combined);
 
     if (matches.length === 0) {
-      return new Response(JSON.stringify({ matches: getFallbackMatches() }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      console.log("AI extraction returned 0 matches, using fallback");
+      return jsonResponse(getFallbackMatches());
     }
 
-    return new Response(JSON.stringify({ matches }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.log(`Extracted ${matches.length} real matches`);
+    return jsonResponse(matches);
   } catch (error) {
     console.error("Error:", error);
-    return new Response(JSON.stringify({ matches: getFallbackMatches() }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse(getFallbackMatches());
   }
 });
 
-function parseMatchesFromHtml(html: string) {
-  const matches: any[] = [];
-  
-  // Parse match data from HLTV HTML
-  const matchRegex = /class="upcomingMatch[^"]*"[^>]*>[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g;
-  const teamRegex = /class="matchTeamName[^"]*">([^<]+)</g;
-  const eventRegex = /class="matchEventName[^"]*">([^<]+)</g;
-  const timeRegex = /data-unix="(\d+)"/g;
-  const formatRegex = /class="matchMeta[^"]*">([^<]+)</g;
+function jsonResponse(matches: any[]) {
+  return new Response(JSON.stringify({ matches }), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
-  // Simple extraction of team names
-  const teams: string[] = [];
-  let match;
-  while ((match = teamRegex.exec(html)) !== null) {
-    teams.push(match[1].trim());
-  }
-
-  const events: string[] = [];
-  while ((match = eventRegex.exec(html)) !== null) {
-    events.push(match[1].trim());
-  }
-
-  const times: number[] = [];
-  while ((match = timeRegex.exec(html)) !== null) {
-    times.push(parseInt(match[1]));
-  }
-
-  const formats: string[] = [];
-  while ((match = formatRegex.exec(html)) !== null) {
-    formats.push(match[1].trim());
-  }
-
-  // Pair up teams into matches
-  for (let i = 0; i < Math.min(teams.length - 1, 12); i += 2) {
-    const matchIdx = i / 2;
-    matches.push({
-      id: `hltv-${matchIdx}`,
-      team1: teams[i] || "TBD",
-      team2: teams[i + 1] || "TBD",
-      event: events[matchIdx] || "CS2 Tournament",
-      time: times[matchIdx] ? new Date(times[matchIdx]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" }) + " CET" : "TBD",
-      format: formats[matchIdx] || "Bo3",
-      rank1: Math.floor(Math.random() * 30) + 1,
-      rank2: Math.floor(Math.random() * 30) + 1,
+async function firecrawlSearch(apiKey: string, query: string, limit: number): Promise<string[]> {
+  try {
+    const res = await fetch("https://api.firecrawl.dev/v1/search", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        limit,
+        scrapeOptions: { formats: ["markdown"] },
+      }),
     });
-  }
 
-  return matches;
+    if (!res.ok) {
+      console.error("Firecrawl search failed:", res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    const results = data.data || data.results || [];
+    return results
+      .map((r: any) => (r.markdown || r.description || "").substring(0, 4000))
+      .filter(Boolean);
+  } catch (err) {
+    console.error("Firecrawl error:", err);
+    return [];
+  }
+}
+
+async function extractMatchesWithAI(apiKey: string, scrapedContent: string) {
+  try {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: `Extract upcoming/today's CS2 match data from the scraped content. Return ONLY valid JSON array of matches.
+
+Each match object:
+{ "id": "unique-id", "team1": "Team Name", "team2": "Team Name", "event": "Tournament Name", "time": "HH:MM CET", "format": "Bo1|Bo3|Bo5", "rank1": number, "rank2": number }
+
+Rules:
+- Use real team names exactly as shown (e.g., "Natus Vincere" not "NAVI")
+- Use real tournament names
+- Rank should be approximate HLTV ranking (1-100)
+- Return 4-12 matches
+- If time is unknown, use "TBD"
+- Only include CS2/CSGO matches, not other games
+- Return ONLY the JSON array, no markdown, no explanation`,
+          },
+          {
+            role: "user",
+            content: `Extract CS2 matches from this scraped data:\n\n${scrapedContent.substring(0, 10000)}`,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("AI gateway error:", response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
+    const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const matches = JSON.parse(cleaned);
+
+    if (!Array.isArray(matches)) return [];
+
+    return matches.map((m: any, i: number) => ({
+      id: m.id || `live-${i}`,
+      team1: m.team1 || "TBD",
+      team2: m.team2 || "TBD",
+      event: m.event || "CS2 Tournament",
+      time: m.time || "TBD",
+      format: m.format || "Bo3",
+      rank1: m.rank1 || 0,
+      rank2: m.rank2 || 0,
+    }));
+  } catch (err) {
+    console.error("AI extraction error:", err);
+    return [];
+  }
 }
 
 function getFallbackMatches() {
-  // Real teams and events based on current CS2 competitive scene
   return [
     { id: "1", team1: "Natus Vincere", team2: "Team Vitality", event: "PGL Major Copenhagen 2025", time: "15:00 CET", format: "Bo3", rank1: 1, rank2: 2 },
     { id: "2", team1: "G2 Esports", team2: "FaZe Clan", event: "IEM Katowice 2025", time: "17:30 CET", format: "Bo3", rank1: 3, rank2: 4 },

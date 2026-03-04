@@ -26,7 +26,8 @@ const Matches = () => {
   const { data: matches, isLoading, error } = useQuery({
     queryKey: ["matches"],
     queryFn: fetchMatches,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 3 * 60 * 1000,
   });
 
   const featured = matches?.[0];

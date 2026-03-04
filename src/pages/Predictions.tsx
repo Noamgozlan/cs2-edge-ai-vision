@@ -16,7 +16,8 @@ const Predictions = () => {
   const { data: matches, isLoading } = useQuery({
     queryKey: ["matches"],
     queryFn: fetchMatches,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 3 * 60 * 1000,
   });
 
   // Fetch AI predictions for each match
