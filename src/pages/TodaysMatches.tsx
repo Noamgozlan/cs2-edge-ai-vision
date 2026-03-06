@@ -176,7 +176,7 @@ const TodaysMatches = () => {
             disabled={isRefreshing}
             className="mt-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
           >
-            {isRefreshing ? "Scraping..." : "Scrape Matches Now"}
+            {isRefreshing ? t("today.scraping" as any) : t("today.scrapeNow" as any)}
           </button>
         </div>
       )}
