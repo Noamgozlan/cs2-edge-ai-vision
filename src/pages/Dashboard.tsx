@@ -5,11 +5,11 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTimezone } from "@/contexts/TimezoneContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchMatches, fetchAIAnalysis, Match } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { TeamLogo } from "@/lib/team-logos";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
@@ -111,12 +111,26 @@ function useDemoBetStats() {
 const Dashboard = () => {
   const { t } = useLanguage();
   const { convertTime } = useTimezone();
+  const queryClient = useQueryClient();
+  const hasTriggeredScan = useRef(false);
 
   const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ["matches"],
     queryFn: fetchMatches,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Auto-trigger AI scan if no matches found
+  useEffect(() => {
+    if (!matchesLoading && matches && matches.length === 0 && !hasTriggeredScan.current) {
+      hasTriggeredScan.current = true;
+      console.log("[Dashboard] No matches found, triggering AI scan...");
+      supabase.functions.invoke("ai-discover-matches").then(() => {
+        // Refetch matches after scan completes
+        queryClient.invalidateQueries({ queryKey: ["matches"] });
+      }).catch(err => console.error("AI scan failed:", err));
+    }
+  }, [matches, matchesLoading, queryClient]);
 
   const { data: predictions, isLoading: predictionsLoading } = useTopPredictions(matches, 4);
   const { data: betStats } = useDemoBetStats();
