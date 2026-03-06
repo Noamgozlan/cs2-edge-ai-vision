@@ -71,9 +71,10 @@ const TodaysMatches = () => {
     return Date.now() - updated > 15 * 60 * 1000;
   });
 
-  const liveMatches = matches.filter((m) => m.status === "live");
-  const upcomingMatches = matches.filter((m) => m.status === "upcoming");
-  const finishedMatches = matches.filter((m) => m.status === "finished");
+  // Only show bettable matches (live + upcoming)
+  const bettableMatches = matches.filter((m) => m.status !== "finished");
+  const liveMatches = bettableMatches.filter((m) => m.status === "live");
+  const upcomingMatches = bettableMatches.filter((m) => m.status === "upcoming");
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -135,7 +136,7 @@ const TodaysMatches = () => {
       )}
 
       {/* Stats Bar */}
-      {matches.length > 0 && (
+      {bettableMatches.length > 0 && (
         <div className="flex items-center gap-4 text-xs">
           {liveMatches.length > 0 && (
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 font-bold">
@@ -146,10 +147,6 @@ const TodaysMatches = () => {
           <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
             <Clock className="w-3.5 h-3.5" />
             {upcomingMatches.length} {t("today.upcoming" as any)}
-          </span>
-          <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
-            <Trophy className="w-3.5 h-3.5" />
-            {finishedMatches.length} {t("today.finished" as any)}
           </span>
         </div>
       )}
@@ -166,7 +163,7 @@ const TodaysMatches = () => {
         </div>
       )}
 
-      {!isLoading && matches.length === 0 && !error && (
+      {!isLoading && bettableMatches.length === 0 && !error && (
         <div className="text-center py-16 space-y-4">
           <WifiOff className="w-12 h-12 text-muted-foreground mx-auto" />
           <p className="text-lg font-bold text-muted-foreground">{t("today.noMatches" as any)}</p>
@@ -191,10 +188,6 @@ const TodaysMatches = () => {
         <MatchSection title="Upcoming" icon="⏰" matches={upcomingMatches} formatTime={formatTime} />
       )}
 
-      {/* Finished Matches */}
-      {finishedMatches.length > 0 && (
-        <MatchSection title="Finished" icon="✅" matches={finishedMatches} formatTime={formatTime} />
-      )}
     </div>
   );
 };
