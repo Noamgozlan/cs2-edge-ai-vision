@@ -32,8 +32,22 @@ serve(async (req) => {
         "HTTP-Referer": "https://cs2-edge-ai-vision.lovable.app",
         "X-Title": "CS2 Edge AI",
       },
+      // Try multiple free models in order of quality
+      const freeModels = [
+        "meta-llama/llama-4-maverick:free",
+        "deepseek/deepseek-chat-v3-0324:free",
+        "google/gemma-3-27b-it:free",
+        "microsoft/phi-4:free",
+      ];
+
+      // Try first model, fallback handled by OpenRouter's model routing
+      const selectedModel = freeModels[0];
+      log(`Using model: ${selectedModel}`);
+
       body: JSON.stringify({
-        model: "google/gemma-3-27b-it:free",
+        model: selectedModel,
+        models: freeModels,
+        route: "fallback",
         messages: [
           {
             role: "system",
