@@ -36,7 +36,6 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "meta-llama/llama-4-scout:free",
         messages: [
-        messages: [
           {
             role: "system",
             content: `You are a CS2 esports data specialist. Today is ${today}. Return ALL CS2 professional matches scheduled for today as a JSON array.
