@@ -166,7 +166,7 @@ const Dashboard = () => {
             to="/dashboard/demo-betting"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition-colors"
           >
-            <DollarSign className="w-3 h-3" /> Demo Betting
+            <DollarSign className="w-3 h-3" /> {t("dash.demoBetting")}
           </Link>
         </div>
       </motion.div>
