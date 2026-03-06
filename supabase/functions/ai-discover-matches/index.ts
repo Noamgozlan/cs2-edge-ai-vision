@@ -14,173 +14,136 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+    if (!OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     const today = new Date().toISOString().slice(0, 10);
-    log(`Scanning for CS2 matches on ${today}...`);
+    log(`Scanning for CS2 matches on ${today} via OpenRouter...`);
 
-    // Ask AI for today's CS2 matches using tool calling for structured output
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Use OpenRouter's fallback routing across free models
+    const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://cs2-edge-ai-vision.lovable.app",
+        "X-Title": "CS2 Edge AI",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.0-flash-001",
         messages: [
           {
             role: "system",
-            content: `You are a CS2 esports data specialist. Your job is to provide accurate information about today's Counter-Strike 2 professional matches. Today's date is ${today}. 
+            content: `You are a CS2 esports data specialist. Today is ${today}. Return ALL CS2 professional matches scheduled for today as a JSON array.
 
-You must return ALL CS2 matches scheduled for today, including:
-- Upcoming matches that haven't started yet
-- Currently live matches
-- Matches that already finished today
+IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks, no explanation. Just the raw JSON array.
 
-For each match provide: team names (official team names), tournament/event name, start time in UTC (24h format like "14:30"), match format (bo1/bo3/bo5), status (upcoming/live/finished), and score if finished or live.
+Each match object must have these fields:
+- "team1": string (official team name)
+- "team2": string (official team name)
+- "tournament": string (event/tournament name)
+- "start_time_utc": string (HH:MM in UTC 24h format)
+- "format": string (bo1, bo3, or bo5)
+- "status": string (upcoming, live, or finished)
+- "score": string (e.g. "2-1" if finished/live, "" if upcoming)
 
-Focus on tier 1 and tier 2 professional matches from events like: BLAST, IEM, ESL Pro League, PGL Major, FACEIT League, CCT, Thunderpick, Betway, Perfect World, and regional leagues.
-
-Be as complete as possible. Include ALL matches you know about for today.`,
+Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, FACEIT League, CCT, Thunderpick, Perfect World, regional leagues, etc.`,
           },
           {
             role: "user",
-            content: `What are all the CS2 professional matches scheduled for today, ${today}? Include upcoming, live, and finished matches. Return them using the provide_matches function.`,
+            content: `List ALL CS2 professional matches for today ${today}. Return ONLY a JSON array of match objects, nothing else.`,
           },
         ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "provide_matches",
-              description: "Provide the list of today's CS2 professional matches.",
-              parameters: {
-                type: "object",
-                properties: {
-                  matches: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        team1: { type: "string", description: "First team name" },
-                        team2: { type: "string", description: "Second team name" },
-                        tournament: { type: "string", description: "Tournament or event name" },
-                        start_time_utc: { type: "string", description: "Start time in HH:MM UTC format (24h), e.g. '14:30'" },
-                        format: { type: "string", enum: ["bo1", "bo3", "bo5"], description: "Match format" },
-                        status: { type: "string", enum: ["upcoming", "live", "finished"], description: "Match status" },
-                        score: { type: "string", description: "Score if live or finished, e.g. '2-1'. Empty string if upcoming." },
-                      },
-                      required: ["team1", "team2", "tournament", "start_time_utc", "format", "status"],
-                      additionalProperties: false,
-                    },
-                  },
-                },
-                required: ["matches"],
-                additionalProperties: false,
-              },
-            },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "provide_matches" } },
+        temperature: 0.1,
+        max_tokens: 4000,
       }),
     });
 
     if (!aiResponse.ok) {
       const status = aiResponse.status;
       const body = await aiResponse.text();
+      logError(`OpenRouter error ${status}: ${body}`);
       if (status === 429) {
-        logError("Rate limited by AI gateway");
         return new Response(JSON.stringify({ error: "Rate limited, please try again later" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (status === 402) {
-        logError("AI credits exhausted");
-        return new Response(JSON.stringify({ error: "AI credits exhausted" }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(`AI gateway error ${status}: ${body}`);
+      throw new Error(`OpenRouter error ${status}: ${body}`);
     }
 
     const aiData = await aiResponse.json();
-    log(`AI response received`);
+    const usedModel = aiData.model || "unknown";
+    log(`Response from model: ${usedModel}`);
 
-    // Extract matches from tool call response
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall?.function?.arguments) {
-      logError("No tool call in AI response");
-      return new Response(JSON.stringify({ error: "AI did not return structured data", raw: aiData }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const content = aiData.choices?.[0]?.message?.content || "";
+    log(`Raw content length: ${content.length}`);
 
-    let parsed: { matches: any[] };
+    // Parse JSON from response
+    let aiMatches: any[] = [];
     try {
-      parsed = JSON.parse(toolCall.function.arguments);
-    } catch (e) {
-      logError(`Failed to parse tool call arguments: ${e}`);
-      return new Response(JSON.stringify({ error: "Failed to parse AI response" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      aiMatches = JSON.parse(content);
+    } catch {
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        try {
+          aiMatches = JSON.parse(jsonMatch[0]);
+        } catch (e2) {
+          logError(`Failed to parse extracted JSON: ${e2}`);
+          return new Response(JSON.stringify({ error: "Failed to parse AI response", raw: content.slice(0, 500) }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      } else {
+        logError("No JSON array found in AI response");
+        return new Response(JSON.stringify({ error: "No match data in AI response", raw: content.slice(0, 500) }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
-    const aiMatches = parsed.matches || [];
-    log(`AI found ${aiMatches.length} matches for ${today}`);
+    if (!Array.isArray(aiMatches)) aiMatches = [];
+    log(`Found ${aiMatches.length} matches`);
 
     if (aiMatches.length === 0) {
-      log("No matches found by AI for today");
       return new Response(JSON.stringify({
-        success: true,
-        source: "lovable-ai",
-        matchesFound: 0,
-        matchesUpserted: 0,
-        date: today,
+        success: true, source: "openrouter", model: usedModel,
+        matchesFound: 0, matchesUpserted: 0, date: today,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Upsert matches into database
+    // Upsert matches
     let upserted = 0;
     for (const m of aiMatches) {
       if (!m.team1 || !m.team2) continue;
 
-      // Build proper start time from HH:MM
       let startTimeUtc: string | null = null;
       if (m.start_time_utc) {
         const timeParts = m.start_time_utc.match(/(\d{1,2}):(\d{2})/);
         if (timeParts) {
           const dt = new Date(`${today}T${timeParts[1].padStart(2, "0")}:${timeParts[2]}:00Z`);
-          if (!isNaN(dt.getTime())) {
-            startTimeUtc = dt.toISOString();
-          }
+          if (!isNaN(dt.getTime())) startTimeUtc = dt.toISOString();
         }
       }
 
       const sourceId = `ai-${m.team1}-${m.team2}-${today}`.replace(/\s+/g, "-").toLowerCase();
 
-      const { error } = await supabase
-        .from("cs2_matches")
-        .upsert({
-          source: "lovable-ai",
-          source_match_id: sourceId,
-          start_time_utc: startTimeUtc,
-          team1_name: m.team1.trim(),
-          team2_name: m.team2.trim(),
-          tournament_name: m.tournament || "CS2 Match",
-          match_format: m.format || "bo3",
-          status: m.status || "upcoming",
-          score: m.score || null,
-          last_updated_utc: new Date().toISOString(),
-          is_stale: false,
-        }, {
-          onConflict: "source,source_match_id",
-        });
+      const { error } = await supabase.from("cs2_matches").upsert({
+        source: "openrouter-ai",
+        source_match_id: sourceId,
+        start_time_utc: startTimeUtc,
+        team1_name: m.team1.trim(),
+        team2_name: m.team2.trim(),
+        tournament_name: m.tournament || "CS2 Match",
+        match_format: m.format || "bo3",
+        status: m.status || "upcoming",
+        score: m.score || null,
+        last_updated_utc: new Date().toISOString(),
+        is_stale: false,
+      }, { onConflict: "source,source_match_id" });
 
       if (error) {
         logError(`Upsert error for ${m.team1} vs ${m.team2}: ${error.message}`);
@@ -193,12 +156,9 @@ Be as complete as possible. Include ALL matches you know about for today.`,
     log(`Done: ${upserted}/${aiMatches.length} matches upserted in ${elapsed}ms`);
 
     return new Response(JSON.stringify({
-      success: true,
-      source: "lovable-ai",
-      matchesFound: aiMatches.length,
-      matchesUpserted: upserted,
-      date: today,
-      elapsedMs: elapsed,
+      success: true, source: "openrouter", model: usedModel,
+      matchesFound: aiMatches.length, matchesUpserted: upserted,
+      date: today, elapsedMs: elapsed,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   } catch (error) {
