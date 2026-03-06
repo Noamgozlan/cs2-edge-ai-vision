@@ -502,7 +502,7 @@ const Dashboard = () => {
           <div className="bg-card border border-border rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Shield className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-bold">Top Rated Players</h2>
+              <h2 className="text-sm font-bold">{t("dash.topPlayers")}</h2>
             </div>
 
             {predictionsLoading ? (
