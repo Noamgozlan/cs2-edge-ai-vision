@@ -325,7 +325,7 @@ const Dashboard = () => {
             <div className="p-4 sm:p-5 border-b border-border flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-bold">AI Match Predictions</h2>
+                <h2 className="text-sm font-bold">{t("dash.aiPredictions")}</h2>
               </div>
               <Link to="/dashboard/predictions" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
                 All Predictions <ArrowUpRight className="w-3 h-3" />
