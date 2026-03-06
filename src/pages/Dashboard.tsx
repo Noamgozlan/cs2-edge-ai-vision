@@ -279,7 +279,7 @@ const Dashboard = () => {
             <div className="p-4 sm:p-5 border-b border-border flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <h2 className="text-sm font-bold">Upcoming Matches</h2>
+                <h2 className="text-sm font-bold">{t("dash.upcomingMatches")}</h2>
               </div>
               <Link to="/dashboard/matches" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
                 View All <ArrowUpRight className="w-3 h-3" />
