@@ -14,15 +14,15 @@ import {
 import { TranslationKeys } from "@/i18n/translations";
 import { motion } from "framer-motion";
 
-const navItems: { titleKey: TranslationKeys | string; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
+const navItems: { titleKey: TranslationKeys; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
   { titleKey: "dash.dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { titleKey: "Today's Matches", url: "/dashboard/todays-matches", icon: CalendarDays, badge: "NEW" },
+  { titleKey: "dash.todaysMatches", url: "/dashboard/todays-matches", icon: CalendarDays, badge: "NEW" },
   { titleKey: "dash.matches", url: "/dashboard/matches", icon: Swords, badge: "LIVE" },
   { titleKey: "dash.predictions", url: "/dashboard/predictions", icon: Brain },
   { titleKey: "dash.oddsComparison", url: "/dashboard/odds", icon: BarChart3 },
-  { titleKey: "Demo Betting", url: "/dashboard/demo-betting", icon: CircleDollarSign },
-  { titleKey: "Bet Tracker", url: "/dashboard/bet-tracker", icon: Target, badge: "NEW" },
-  { titleKey: "Bankroll", url: "/dashboard/bankroll", icon: Wallet },
+  { titleKey: "dash.demoBetting", url: "/dashboard/demo-betting", icon: CircleDollarSign },
+  { titleKey: "dash.betTracker", url: "/dashboard/bet-tracker", icon: Target, badge: "NEW" },
+  { titleKey: "dash.bankroll", url: "/dashboard/bankroll", icon: Wallet },
   { titleKey: "dash.settings", url: "/dashboard/settings", icon: Settings },
 ];
 
