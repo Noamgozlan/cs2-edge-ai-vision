@@ -180,23 +180,24 @@ const TodaysMatches = () => {
 
       {/* Live Matches */}
       {liveMatches.length > 0 && (
-        <MatchSection title="Live Now" icon="🔴" matches={liveMatches} formatTime={formatTime} />
+        <MatchSection title={t("today.liveNow" as any)} icon="🔴" matches={liveMatches} formatTime={formatTime} t={t} />
       )}
 
       {/* Upcoming Matches */}
       {upcomingMatches.length > 0 && (
-        <MatchSection title="Upcoming" icon="⏰" matches={upcomingMatches} formatTime={formatTime} />
+        <MatchSection title={t("today.upcoming" as any)} icon="⏰" matches={upcomingMatches} formatTime={formatTime} t={t} />
       )}
 
     </div>
   );
 };
 
-function MatchSection({ title, icon, matches, formatTime }: {
+function MatchSection({ title, icon, matches, formatTime, t }: {
   title: string;
   icon: string;
   matches: CS2Match[];
   formatTime: (t: string | null) => string;
+  t: (key: any) => string;
 }) {
   return (
     <div className="space-y-3">
@@ -205,7 +206,7 @@ function MatchSection({ title, icon, matches, formatTime }: {
           <span>{icon}</span> {title}
         </span>
         <div className="h-px flex-1 bg-border" />
-        <span className="text-[10px] text-muted-foreground font-bold">{matches.length} matches</span>
+        <span className="text-[10px] text-muted-foreground font-bold">{matches.length} {t("today.matchesCount" as any)}</span>
       </div>
 
       <div className="space-y-2">
@@ -222,6 +223,7 @@ function MatchCard({ match: m, index, formatTime }: {
   index: number;
   formatTime: (t: string | null) => string;
 }) {
+  const { t } = useLanguage();
   const cfg = statusConfig[m.status] || statusConfig.upcoming;
   const StatusIcon = cfg.icon;
 
@@ -253,26 +255,26 @@ function MatchCard({ match: m, index, formatTime }: {
 
         {/* Teams */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <TeamLogo name={m.team1_name} size={28} />
+          <TeamLogo name={m.team1_name} size={28} badgeUrl={m.team1_logo} />
           <span className="font-bold text-sm truncate">{m.team1_name}</span>
           {m.score ? (
             <span className="text-sm font-black text-primary shrink-0">{m.score}</span>
           ) : (
-            <span className="text-xs text-muted-foreground font-bold shrink-0">VS</span>
+            <span className="text-xs text-muted-foreground font-bold shrink-0">{t("common.vs" as any)}</span>
           )}
           <span className="font-bold text-sm truncate">{m.team2_name}</span>
-          <TeamLogo name={m.team2_name} size={28} />
+          <TeamLogo name={m.team2_name} size={28} badgeUrl={m.team2_logo} />
         </div>
 
         {/* Tournament */}
         <div className="hidden lg:flex flex-col items-center gap-0.5 w-40 shrink-0">
-          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Tournament</span>
+          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{t("matches.tournament" as any)}</span>
           <span className="text-xs font-semibold text-center truncate w-full">{m.tournament_name || "—"}</span>
         </div>
 
         {/* Format */}
         <div className="hidden md:flex flex-col items-center gap-0.5 w-12 shrink-0">
-          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">FMT</span>
+          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{t("matches.format" as any)}</span>
           <span className="text-xs font-black uppercase">{m.match_format}</span>
         </div>
 

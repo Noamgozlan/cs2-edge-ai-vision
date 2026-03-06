@@ -227,7 +227,7 @@ export function getTeamEntry(teamName: string): TeamEntry | undefined {
   return LOGO_MAP[lower];
 }
 
-export function TeamLogo({ name, size = 40 }: { name: string; size?: number }) {
+export function TeamLogo({ name, size = 40, badgeUrl }: { name: string; size?: number; badgeUrl?: string | null }) {
   const entry = (() => {
     const lower = name.toLowerCase();
     let e = LOGO_MAP[lower];
@@ -238,7 +238,7 @@ export function TeamLogo({ name, size = 40 }: { name: string; size?: number }) {
     return undefined;
   })();
 
-  const sources = [entry?.local, entry?.cdn].filter(Boolean) as string[];
+  const sources = [entry?.local, entry?.cdn, badgeUrl].filter(Boolean) as string[];
   const [sourceIndex, setSourceIndex] = useState(0);
   const [failed, setFailed] = useState(false);
 

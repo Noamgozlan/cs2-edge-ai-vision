@@ -45,13 +45,19 @@ IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks, no explanation. 
 Each match object must have these fields:
 - "team1": string (official team name)
 - "team2": string (official team name)
+- "team1_logo": string (URL to team 1 logo from HLTV or other esports CDN, e.g. "https://img-cdn.hltv.org/teamlogo/...")
+- "team2_logo": string (URL to team 2 logo from HLTV or other esports CDN)
 - "tournament": string (event/tournament name)
 - "start_time_utc": string (HH:MM in UTC 24h format)
 - "format": string (bo1, bo3, or bo5)
 - "status": string (upcoming, live, or finished)
 - "score": string (e.g. "2-1" if finished/live, "" if upcoming)
+- "team1_rank": number (HLTV world ranking, 0 if unknown)
+- "team2_rank": number (HLTV world ranking, 0 if unknown)
 
-Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, FACEIT League, CCT, Thunderpick, Perfect World, regional leagues, etc.`,
+Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, FACEIT League, CCT, Thunderpick, Perfect World, regional leagues, etc.
+
+For team logos, use the HLTV CDN format: https://img-cdn.hltv.org/teamlogo/HASH.svg or .png - use actual known logo URLs for well-known teams.`,
           },
           {
             role: "user",
@@ -137,6 +143,10 @@ Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, F
         start_time_utc: startTimeUtc,
         team1_name: m.team1.trim(),
         team2_name: m.team2.trim(),
+        team1_logo: m.team1_logo || null,
+        team2_logo: m.team2_logo || null,
+        team1_rank: m.team1_rank || 0,
+        team2_rank: m.team2_rank || 0,
         tournament_name: m.tournament || "CS2 Match",
         match_format: m.format || "bo3",
         status: m.status || "upcoming",

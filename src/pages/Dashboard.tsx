@@ -155,10 +155,10 @@ const Dashboard = () => {
       <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            Welcome back, <span className="text-gradient">Analyst</span>
+            {t("dash.welcomeBack")} <span className="text-gradient">{t("dash.commandCenter" as any)}</span>
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            Live CS2 match data & AI predictions — powered by real-time HLTV intel.
+            {t("dash.liveData")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ const Dashboard = () => {
             to="/dashboard/demo-betting"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition-colors"
           >
-            <DollarSign className="w-3 h-3" /> Demo Betting
+            <DollarSign className="w-3 h-3" /> {t("dash.demoBetting")}
           </Link>
         </div>
       </motion.div>
@@ -214,7 +214,7 @@ const Dashboard = () => {
                 {/* Teams */}
                 <div className="flex items-center gap-4 sm:gap-6 flex-1">
                   <div className="flex flex-col items-center gap-1.5">
-                    <TeamLogo name={featured.team1} size={48} />
+                    <TeamLogo name={featured.team1} size={48} badgeUrl={featured.team1Badge} />
                     <span className="text-sm font-black text-center">{featured.team1}</span>
                     {featured.rank1 > 0 && (
                       <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">#{featured.rank1}</span>
@@ -225,7 +225,7 @@ const Dashboard = () => {
                     <span className="text-[9px] text-muted-foreground mt-0.5">{featured.format}</span>
                   </div>
                   <div className="flex flex-col items-center gap-1.5">
-                    <TeamLogo name={featured.team2} size={48} />
+                    <TeamLogo name={featured.team2} size={48} badgeUrl={featured.team2Badge} />
                     <span className="text-sm font-black text-center">{featured.team2}</span>
                     {featured.rank2 > 0 && (
                       <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">#{featured.rank2}</span>
@@ -252,7 +252,7 @@ const Dashboard = () => {
                     </>
                   ) : predictionsLoading ? (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="w-4 h-4 animate-spin" /> Analyzing…
+                      <Loader2 className="w-4 h-4 animate-spin" /> {t("dash.analyzing")}
                     </div>
                   ) : null}
                 </div>
@@ -262,7 +262,7 @@ const Dashboard = () => {
                   <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{featured.event}</p>
                   <p className="text-sm font-bold text-primary">{convertTime(featured.time)}</p>
                   <p className="text-[10px] font-bold text-primary flex items-center gap-1 justify-center sm:justify-end mt-1">
-                    View Analysis <ChevronRight className="w-3 h-3" />
+                    {t("dash.viewAnalysis")} <ChevronRight className="w-3 h-3" />
                   </p>
                 </div>
               </div>
@@ -279,10 +279,10 @@ const Dashboard = () => {
             <div className="p-4 sm:p-5 border-b border-border flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <h2 className="text-sm font-bold">Upcoming Matches</h2>
+                <h2 className="text-sm font-bold">{t("dash.upcomingMatches")}</h2>
               </div>
               <Link to="/dashboard/matches" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
-                View All <ArrowUpRight className="w-3 h-3" />
+                {t("dash.viewAll")} <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
@@ -303,11 +303,11 @@ const Dashboard = () => {
                       to={`/dashboard/match/${m.id}?team1=${encodeURIComponent(m.team1)}&team2=${encodeURIComponent(m.team2)}&event=${encodeURIComponent(m.event)}&format=${encodeURIComponent(m.format)}&time=${encodeURIComponent(m.time)}&rank1=${m.rank1}&rank2=${m.rank2}`}
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-muted/30 transition-colors group"
                     >
-                      <TeamLogo name={m.team1} size={24} />
+                      <TeamLogo name={m.team1} size={24} badgeUrl={m.team1Badge} />
                       <span className="font-semibold text-sm truncate flex-1 min-w-0">{m.team1}</span>
-                      <span className="text-[9px] font-black text-muted-foreground">VS</span>
+                      <span className="text-[9px] font-black text-muted-foreground">{t("common.vs")}</span>
                       <span className="font-semibold text-sm truncate flex-1 min-w-0 text-right">{m.team2}</span>
-                      <TeamLogo name={m.team2} size={24} />
+                      <TeamLogo name={m.team2} size={24} badgeUrl={m.team2Badge} />
                       <div className="hidden sm:flex items-center gap-2 ml-2">
                         <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted font-bold text-muted-foreground">{m.format}</span>
                         <span className="text-xs font-bold text-primary">{convertTime(m.time)}</span>
@@ -325,10 +325,10 @@ const Dashboard = () => {
             <div className="p-4 sm:p-5 border-b border-border flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-bold">AI Match Predictions</h2>
+                <h2 className="text-sm font-bold">{t("dash.aiPredictions")}</h2>
               </div>
               <Link to="/dashboard/predictions" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
-                All Predictions <ArrowUpRight className="w-3 h-3" />
+                {t("dash.allPredictions")} <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
@@ -409,7 +409,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold">Demo Betting</h2>
+                    <h2 className="text-sm font-bold">{t("dash.demoBettingWidget")}</h2>
                   </div>
                   <span className={`text-xs font-bold ${betStats.profit >= 0 ? "text-accent" : "text-destructive"}`}>
                     {betStats.profit >= 0 ? "+" : ""}${betStats.profit.toFixed(2)}
@@ -462,7 +462,7 @@ const Dashboard = () => {
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-4">
                 <Flame className="w-5 h-5 text-primary" />
-                <h2 className="text-sm font-bold">Best Value Pick</h2>
+                <h2 className="text-sm font-bold">{t("dash.bestValuePick")}</h2>
               </div>
 
               {predictionsLoading ? (
@@ -475,7 +475,7 @@ const Dashboard = () => {
                 <div className="space-y-3">
                   <div className="rounded-xl p-3 bg-primary/10 border border-primary/20">
                     <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">
-                      🎯 {bestPick.analysis.prediction.confidence}% Confidence
+                      🎯 {bestPick.analysis.prediction.confidence}% {t("match.confidence")}
                     </p>
                     <p className="text-sm font-bold mb-1.5">{bestPick.analysis.prediction.recommendedBet}</p>
                     <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">
@@ -483,7 +483,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Quick Odds</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{t("dash.compareOdds")}</p>
                     {Object.entries(bestPick.analysis.odds?.team1 || {}).slice(0, 3).map(([bk, odd]) => (
                       <div key={bk} className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground capitalize">{bk}</span>
@@ -493,7 +493,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground py-4">No predictions available yet.</p>
+                <p className="text-xs text-muted-foreground py-4">{t("dash.noPredictions")}</p>
               )}
             </div>
           </div>
@@ -502,7 +502,7 @@ const Dashboard = () => {
           <div className="bg-card border border-border rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Shield className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-bold">Top Rated Players</h2>
+              <h2 className="text-sm font-bold">{t("dash.topPlayers")}</h2>
             </div>
 
             {predictionsLoading ? (
@@ -558,28 +558,28 @@ const Dashboard = () => {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-center">
                 <Zap className="w-4 h-4 mx-auto mb-1.5 text-primary" />
-                <p className="text-[10px] font-bold">Live Matches</p>
+                <p className="text-[10px] font-bold">{t("dash.liveMatches")}</p>
               </motion.div>
             </Link>
             <Link to="/dashboard/odds">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-center">
                 <BarChart3 className="w-4 h-4 mx-auto mb-1.5 text-accent" />
-                <p className="text-[10px] font-bold">Compare Odds</p>
+                <p className="text-[10px] font-bold">{t("dash.compareOdds")}</p>
               </motion.div>
             </Link>
             <Link to="/dashboard/demo-betting?tab=simulation">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-center">
                 <Trophy className="w-4 h-4 mx-auto mb-1.5 text-yellow-500" />
-                <p className="text-[10px] font-bold">Simulation</p>
+                <p className="text-[10px] font-bold">{t("dash.simulation")}</p>
               </motion.div>
             </Link>
             <Link to="/dashboard/predictions">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-center">
                 <Sparkles className="w-4 h-4 mx-auto mb-1.5 text-purple-400" />
-                <p className="text-[10px] font-bold">Predictions</p>
+                <p className="text-[10px] font-bold">{t("dash.predictions")}</p>
               </motion.div>
             </Link>
           </div>
