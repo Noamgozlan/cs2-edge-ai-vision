@@ -278,6 +278,17 @@ function MatchCard({ match: m, index, formatTime }: {
           <span className="text-xs font-black uppercase">{m.match_format}</span>
         </div>
 
+        {/* HLTV Link */}
+        <a
+          href={m.url || `https://www.hltv.org/matches?team1=${encodeURIComponent(m.team1_name)}&team2=${encodeURIComponent(m.team2_name)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/30 transition-all"
+        >
+          HLTV <ExternalLink className="w-3 h-3" />
+        </a>
+
         {/* Stale indicator */}
         {m.is_stale && (
           <span className="shrink-0" aria-label="Data may be outdated">
