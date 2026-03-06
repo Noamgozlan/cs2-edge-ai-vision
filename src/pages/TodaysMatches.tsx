@@ -52,6 +52,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
 
 const TodaysMatches = () => {
   const { convertTime, timezoneLabel } = useTimezone();
+  const { t } = useLanguage();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
