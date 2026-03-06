@@ -136,7 +136,7 @@ const TodaysMatches = () => {
       )}
 
       {/* Stats Bar */}
-      {matches.length > 0 && (
+      {bettableMatches.length > 0 && (
         <div className="flex items-center gap-4 text-xs">
           {liveMatches.length > 0 && (
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 font-bold">
@@ -147,10 +147,6 @@ const TodaysMatches = () => {
           <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
             <Clock className="w-3.5 h-3.5" />
             {upcomingMatches.length} {t("today.upcoming" as any)}
-          </span>
-          <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
-            <Trophy className="w-3.5 h-3.5" />
-            {finishedMatches.length} {t("today.finished" as any)}
           </span>
         </div>
       )}
