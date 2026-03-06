@@ -493,7 +493,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground py-4">No predictions available yet.</p>
+                <p className="text-xs text-muted-foreground py-4">{t("dash.noPredictions")}</p>
               )}
             </div>
           </div>
