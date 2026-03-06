@@ -262,7 +262,7 @@ const Dashboard = () => {
                   <p className="text-[10px] text-muted-foreground truncate max-w-[160px]">{featured.event}</p>
                   <p className="text-sm font-bold text-primary">{convertTime(featured.time)}</p>
                   <p className="text-[10px] font-bold text-primary flex items-center gap-1 justify-center sm:justify-end mt-1">
-                    View Analysis <ChevronRight className="w-3 h-3" />
+                    {t("dash.viewAnalysis")} <ChevronRight className="w-3 h-3" />
                   </p>
                 </div>
               </div>
