@@ -192,11 +192,12 @@ const TodaysMatches = () => {
   );
 };
 
-function MatchSection({ title, icon, matches, formatTime }: {
+function MatchSection({ title, icon, matches, formatTime, t }: {
   title: string;
   icon: string;
   matches: CS2Match[];
   formatTime: (t: string | null) => string;
+  t: (key: any) => string;
 }) {
   return (
     <div className="space-y-3">
