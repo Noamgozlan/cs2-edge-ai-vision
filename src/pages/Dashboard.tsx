@@ -155,10 +155,10 @@ const Dashboard = () => {
       <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-            Welcome back, <span className="text-gradient">Analyst</span>
+            {t("dash.welcomeBack")} <span className="text-gradient">{t("dash.commandCenter" as any)}</span>
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            Live CS2 match data & AI predictions — powered by real-time HLTV intel.
+            {t("dash.liveData")}
           </p>
         </div>
         <div className="flex items-center gap-2">
