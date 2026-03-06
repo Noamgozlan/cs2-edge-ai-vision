@@ -25,10 +25,11 @@ serve(async (req) => {
     log(`Scanning for CS2 matches on ${today} via OpenRouter...`);
 
     // Use OpenRouter's fallback routing across free models
+    // Use free models with fallback to cheap paid models
     const freeModels = [
       "meta-llama/llama-4-maverick:free",
-      "deepseek/deepseek-chat-v3-0324:free",
       "google/gemma-3-27b-it:free",
+      "meta-llama/llama-4-scout:free",
     ];
 
     const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
