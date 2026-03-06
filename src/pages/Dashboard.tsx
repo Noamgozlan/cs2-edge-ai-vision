@@ -328,7 +328,7 @@ const Dashboard = () => {
                 <h2 className="text-sm font-bold">{t("dash.aiPredictions")}</h2>
               </div>
               <Link to="/dashboard/predictions" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
-                All Predictions <ArrowUpRight className="w-3 h-3" />
+                {t("dash.allPredictions")} <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
