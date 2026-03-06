@@ -109,7 +109,7 @@ const DashboardSidebar = () => {
                 )}
 
                 <item.icon className={`h-4 w-4 relative z-10 ${isActive ? "text-primary" : ""}`} />
-                <span className="relative z-10">{item.titleKey.startsWith("dash.") ? t(item.titleKey as any) : item.titleKey}</span>
+                <span className="relative z-10">{t(item.titleKey as any)}</span>
 
                 {item.badge && (
                   <span className="ml-auto relative z-10 px-1.5 py-0.5 rounded text-[9px] font-black bg-accent/15 text-accent border border-accent/20 animate-pulse">
