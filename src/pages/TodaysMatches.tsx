@@ -37,7 +37,8 @@ async function fetchTodaysMatches(): Promise<{ matches: CS2Match[]; staleCount: 
 }
 
 async function triggerScrape(): Promise<any> {
-  const { data, error } = await supabase.functions.invoke("scrape-cs2-matches");
+  // Use AI to discover today's matches
+  const { data, error } = await supabase.functions.invoke("ai-discover-matches");
   if (error) throw error;
   return data;
 }
