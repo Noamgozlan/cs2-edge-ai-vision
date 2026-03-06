@@ -273,7 +273,7 @@ function MatchCard({ match: m, index, formatTime }: {
 
         {/* Format */}
         <div className="hidden md:flex flex-col items-center gap-0.5 w-12 shrink-0">
-          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">FMT</span>
+          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{t("matches.format" as any)}</span>
           <span className="text-xs font-black uppercase">{m.match_format}</span>
         </div>
 
