@@ -483,7 +483,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Quick Odds</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{t("dash.compareOdds")}</p>
                     {Object.entries(bestPick.analysis.odds?.team1 || {}).slice(0, 3).map(([bk, odd]) => (
                       <div key={bk} className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground capitalize">{bk}</span>
