@@ -149,7 +149,7 @@ const TodaysMatches = () => {
           </span>
           <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
             <Trophy className="w-3.5 h-3.5" />
-            {finishedMatches.length} Finished
+            {finishedMatches.length} {t("today.finished" as any)}
           </span>
         </div>
       )}
