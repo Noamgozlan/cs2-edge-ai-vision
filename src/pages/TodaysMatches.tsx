@@ -223,6 +223,7 @@ function MatchCard({ match: m, index, formatTime }: {
   index: number;
   formatTime: (t: string | null) => string;
 }) {
+  const { t } = useLanguage();
   const cfg = statusConfig[m.status] || statusConfig.upcoming;
   const StatusIcon = cfg.icon;
 
