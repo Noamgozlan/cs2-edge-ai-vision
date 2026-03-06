@@ -225,7 +225,7 @@ const Dashboard = () => {
                     <span className="text-[9px] text-muted-foreground mt-0.5">{featured.format}</span>
                   </div>
                   <div className="flex flex-col items-center gap-1.5">
-                    <TeamLogo name={featured.team2} size={48} />
+                    <TeamLogo name={featured.team2} size={48} badgeUrl={featured.team2Badge} />
                     <span className="text-sm font-black text-center">{featured.team2}</span>
                     {featured.rank2 > 0 && (
                       <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">#{featured.rank2}</span>
