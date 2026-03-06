@@ -255,15 +255,15 @@ function MatchCard({ match: m, index, formatTime }: {
 
         {/* Teams */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <TeamLogo name={m.team1_name} size={28} />
+          <TeamLogo name={m.team1_name} size={28} badgeUrl={m.team1_logo} />
           <span className="font-bold text-sm truncate">{m.team1_name}</span>
           {m.score ? (
             <span className="text-sm font-black text-primary shrink-0">{m.score}</span>
           ) : (
-            <span className="text-xs text-muted-foreground font-bold shrink-0">VS</span>
+            <span className="text-xs text-muted-foreground font-bold shrink-0">{t("common.vs" as any)}</span>
           )}
           <span className="font-bold text-sm truncate">{m.team2_name}</span>
-          <TeamLogo name={m.team2_name} size={28} />
+          <TeamLogo name={m.team2_name} size={28} badgeUrl={m.team2_logo} />
         </div>
 
         {/* Tournament */}
