@@ -126,9 +126,9 @@ const TodaysMatches = () => {
         >
           <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0" />
           <div>
-            <p className="text-sm font-bold text-yellow-400">Data may be outdated</p>
+            <p className="text-sm font-bold text-yellow-400">{t("today.staleWarning" as any)}</p>
             <p className="text-xs text-yellow-500/80">
-              Some match data hasn't been updated in over 15 minutes. Scores and statuses may not be current.
+              {t("today.staleDesc" as any)}
             </p>
           </div>
         </motion.div>
