@@ -572,7 +572,7 @@ const Dashboard = () => {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-center">
                 <Trophy className="w-4 h-4 mx-auto mb-1.5 text-yellow-500" />
-                <p className="text-[10px] font-bold">Simulation</p>
+                <p className="text-[10px] font-bold">{t("dash.simulation")}</p>
               </motion.div>
             </Link>
             <Link to="/dashboard/predictions">
