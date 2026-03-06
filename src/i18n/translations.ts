@@ -75,7 +75,7 @@ export type TranslationKeys =
   | "demo.title" | "demo.bets" | "demo.simulationTab";
 
 
-type Translations = Record<TranslationKeys, string>;
+type Translations = Partial<Record<TranslationKeys, string>> & Record<string, string>;
 
 export const translations: Record<Language, Translations> = {
   en: {
