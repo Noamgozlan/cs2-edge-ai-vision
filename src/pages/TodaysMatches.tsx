@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Wifi, WifiOff, Clock, Trophy, Zap, AlertTriangle, RefreshCw } from "lucide-react";
 import { TeamLogo } from "@/lib/team-logos";
 import { useTimezone } from "@/contexts/TimezoneContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -51,6 +52,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
 
 const TodaysMatches = () => {
   const { convertTime, timezoneLabel } = useTimezone();
+  const { t } = useLanguage();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -100,7 +102,7 @@ const TodaysMatches = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-black tracking-tight">Today's CS2 Matches</h1>
+          <h1 className="text-2xl font-black tracking-tight">{t("today.title" as any)}</h1>
           <span className="text-[10px] font-black uppercase tracking-widest bg-accent/20 text-accent px-2.5 py-1 rounded-full">
             {timezoneLabel}
           </span>
@@ -111,7 +113,7 @@ const TodaysMatches = () => {
           className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border text-sm font-bold text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Refreshing..." : "Refresh"}
+          {isRefreshing ? t("common.refreshing" as any) : t("common.refresh" as any)}
         </button>
       </div>
 
@@ -124,9 +126,9 @@ const TodaysMatches = () => {
         >
           <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0" />
           <div>
-            <p className="text-sm font-bold text-yellow-400">Data may be outdated</p>
+            <p className="text-sm font-bold text-yellow-400">{t("today.staleWarning" as any)}</p>
             <p className="text-xs text-yellow-500/80">
-              Some match data hasn't been updated in over 15 minutes. Scores and statuses may not be current.
+              {t("today.staleDesc" as any)}
             </p>
           </div>
         </motion.div>
@@ -138,16 +140,16 @@ const TodaysMatches = () => {
           {liveMatches.length > 0 && (
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 font-bold">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              {liveMatches.length} Live
+              {liveMatches.length} {t("today.live" as any)}
             </span>
           )}
           <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
             <Clock className="w-3.5 h-3.5" />
-            {upcomingMatches.length} Upcoming
+            {upcomingMatches.length} {t("today.upcoming" as any)}
           </span>
           <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
             <Trophy className="w-3.5 h-3.5" />
-            {finishedMatches.length} Finished
+            {finishedMatches.length} {t("today.finished" as any)}
           </span>
         </div>
       )}
@@ -167,14 +169,14 @@ const TodaysMatches = () => {
       {!isLoading && matches.length === 0 && !error && (
         <div className="text-center py-16 space-y-4">
           <WifiOff className="w-12 h-12 text-muted-foreground mx-auto" />
-          <p className="text-lg font-bold text-muted-foreground">No matches found for today</p>
-          <p className="text-sm text-muted-foreground">Click refresh to scrape latest match data.</p>
+          <p className="text-lg font-bold text-muted-foreground">{t("today.noMatches" as any)}</p>
+          <p className="text-sm text-muted-foreground">{t("today.noMatchesDesc" as any)}</p>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
             className="mt-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
           >
-            {isRefreshing ? "Scraping..." : "Scrape Matches Now"}
+            {isRefreshing ? t("today.scraping" as any) : t("today.scrapeNow" as any)}
           </button>
         </div>
       )}

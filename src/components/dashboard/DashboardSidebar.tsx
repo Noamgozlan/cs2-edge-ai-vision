@@ -14,15 +14,15 @@ import {
 import { TranslationKeys } from "@/i18n/translations";
 import { motion } from "framer-motion";
 
-const navItems: { titleKey: TranslationKeys | string; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
+const navItems: { titleKey: TranslationKeys; url: string; icon: typeof LayoutDashboard; badge?: string }[] = [
   { titleKey: "dash.dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { titleKey: "Today's Matches", url: "/dashboard/todays-matches", icon: CalendarDays, badge: "NEW" },
+  { titleKey: "dash.todaysMatches", url: "/dashboard/todays-matches", icon: CalendarDays, badge: "NEW" },
   { titleKey: "dash.matches", url: "/dashboard/matches", icon: Swords, badge: "LIVE" },
   { titleKey: "dash.predictions", url: "/dashboard/predictions", icon: Brain },
   { titleKey: "dash.oddsComparison", url: "/dashboard/odds", icon: BarChart3 },
-  { titleKey: "Demo Betting", url: "/dashboard/demo-betting", icon: CircleDollarSign },
-  { titleKey: "Bet Tracker", url: "/dashboard/bet-tracker", icon: Target, badge: "NEW" },
-  { titleKey: "Bankroll", url: "/dashboard/bankroll", icon: Wallet },
+  { titleKey: "dash.demoBetting", url: "/dashboard/demo-betting", icon: CircleDollarSign },
+  { titleKey: "dash.betTracker", url: "/dashboard/bet-tracker", icon: Target, badge: "NEW" },
+  { titleKey: "dash.bankroll", url: "/dashboard/bankroll", icon: Wallet },
   { titleKey: "dash.settings", url: "/dashboard/settings", icon: Settings },
 ];
 
@@ -62,7 +62,7 @@ const DashboardSidebar = () => {
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-0.5 relative z-10">
         <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] px-3 mb-3">
-          Command Center
+          {t("dash.commandCenter" as any)}
         </p>
         {navItems.map((item) => {
           const active = location.pathname === item.url ||
@@ -108,7 +108,7 @@ const DashboardSidebar = () => {
                 )}
 
                 <item.icon className={`h-4 w-4 relative z-10 ${isActive ? "text-primary" : ""}`} />
-                <span className="relative z-10">{item.titleKey.startsWith("dash.") ? t(item.titleKey as any) : item.titleKey}</span>
+                <span className="relative z-10">{t(item.titleKey as any)}</span>
 
                 {item.badge && (
                   <span className="ml-auto relative z-10 px-1.5 py-0.5 rounded text-[9px] font-black bg-accent/15 text-accent border border-accent/20 animate-pulse">
@@ -145,32 +145,32 @@ const DashboardSidebar = () => {
             <>
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle2 className="w-4 h-4 text-accent" />
-                <span className="text-xs font-bold text-accent">Pro Active</span>
+                <span className="text-xs font-bold text-accent">{t("settings.proActive" as any)}</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-                You have full access to all premium features
+                {t("settings.fullAccess" as any)}
               </p>
               <button
                 onClick={openPortal}
                 className="w-full py-2 rounded-lg text-[11px] font-bold text-foreground bg-muted hover:bg-muted/80 transition-all"
               >
-                Manage Subscription
+                {t("settings.manageSubscription" as any)}
               </button>
             </>
           ) : (
             <>
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-4 h-4 text-primary" />
-                <span className="text-xs font-bold text-foreground">Pro Plan</span>
+                <span className="text-xs font-bold text-foreground">{t("settings.proPlan" as any)}</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-                Unlock real-time edge data & unlimited AI predictions
+                {t("settings.unlockFeatures" as any)}
               </p>
               <button
                 onClick={openCheckout}
                 className="w-full py-2 rounded-lg text-[11px] font-bold text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all shadow-md shadow-primary/20"
               >
-                Go Premium — $19.99/mo
+                {t("predictions.upgradePro" as any)}
               </button>
             </>
           )}

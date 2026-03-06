@@ -21,15 +21,61 @@ export type TranslationKeys =
   | "dash.dashboard" | "dash.matches" | "dash.predictions" | "dash.oddsComparison" | "dash.settings"
   | "dash.todayMatches" | "dash.activePredictions" | "dash.winRate" | "dash.bestValue"
   | "dash.recentPredictions" | "dash.overview"
+  | "dash.todaysMatches" | "dash.demoBetting" | "dash.betTracker" | "dash.bankroll"
+  | "dash.commandCenter" | "dash.welcomeBack" | "dash.liveData"
+  | "dash.upcomingMatches" | "dash.aiPredictions" | "dash.viewAll" | "dash.allPredictions"
+  | "dash.analyzing" | "dash.viewAnalysis" | "dash.bestValuePick" | "dash.topPlayers"
+  | "dash.liveMatches" | "dash.compareOdds" | "dash.simulation"
+  | "dash.demoBettingWidget" | "dash.noPredictions"
   | "matches.title" | "matches.subtitle"
+  | "matches.allMatches" | "matches.liveNow" | "matches.majors" | "matches.tier1" | "matches.favorites"
+  | "matches.grandFinal" | "matches.premiumAnalysis" | "matches.viewPredictions"
+  | "matches.allScheduled" | "matches.today" | "matches.tournament" | "matches.format"
+  | "matches.failedLoad"
   | "predictions.title" | "predictions.subtitle"
+  | "predictions.generating" | "predictions.unlockPro" | "predictions.unlockAll"
+  | "predictions.freeLimit" | "predictions.upgradePro"
   | "odds.title" | "odds.subtitle" | "odds.site"
   | "match.back" | "match.confidence" | "match.recommendedBet" | "match.projectedVeto" | "match.breakdown"
   | "settings.title" | "settings.subtitle" | "settings.comingSoon"
+  | "settings.profile" | "settings.appearance" | "settings.timeRegion" | "settings.notifications"
+  | "settings.display" | "settings.bankrollSettings" | "settings.subscription" | "settings.security"
+  | "settings.manageAccount" | "settings.saveProfile" | "settings.saving"
+  | "settings.theme" | "settings.emailCantChange"
+  | "settings.highValueAlerts" | "settings.highValueDesc"
+  | "settings.oddsMovement" | "settings.oddsMovementDesc"
+  | "settings.matchStarting" | "settings.matchStartingDesc"
+  | "settings.predictionResults" | "settings.predictionResultsDesc"
+  | "settings.savePreferences" | "settings.oddsFormat" | "settings.compactMode" | "settings.compactModeDesc"
+  | "settings.showConfidence" | "settings.showConfidenceDesc" | "settings.saveDisplay"
+  | "settings.startingBankroll" | "settings.kellyFraction" | "settings.riskAlert" | "settings.saveBankroll"
+  | "settings.conservative" | "settings.moderate" | "settings.aggressive"
+  | "settings.proActive" | "settings.fullAccess" | "settings.manageSubscription"
+  | "settings.proPlan" | "settings.freePlan" | "settings.unlockFeatures" | "settings.upgradeRenews"
+  | "settings.unlimitedPredictions" | "settings.realtimeData" | "settings.mapVetoSim"
+  | "settings.playerHeatmap" | "settings.bankrollManager" | "settings.oddsComparison"
+  | "settings.threePerDay" | "settings.basicStats"
+  | "settings.password" | "settings.resetPassword" | "settings.resetDesc"
+  | "settings.signOut" | "settings.signOutDesc" | "settings.dangerZone"
+  | "settings.deleteAccount" | "settings.deleteDesc"
+  | "settings.timezone" | "settings.currentTimezone" | "settings.timezoneDesc"
   | "common.pending" | "common.won" | "common.lost"
-  | "theme.light" | "theme.dark" | "lang.language";
+  | "common.vs" | "common.rank" | "common.refresh" | "common.refreshing"
+  | "theme.light" | "theme.dark" | "lang.language"
+  | "today.title" | "today.staleWarning" | "today.staleDesc"
+  | "today.live" | "today.upcoming" | "today.finished"
+  | "today.noMatches" | "today.noMatchesDesc" | "today.scrapeNow" | "today.scraping"
+  | "today.liveNow" | "today.matchesCount"
+  | "tracker.title" | "tracker.subtitle" | "tracker.winRate" | "tracker.profitLoss"
+  | "tracker.roi" | "tracker.totalBets" | "tracker.streak"
+  | "tracker.bankrollGrowth" | "tracker.resultsBreakdown" | "tracker.winRateByType"
+  | "tracker.history" | "tracker.all" | "tracker.noTracked" | "tracker.noFilter"
+  | "tracker.liveData" | "tracker.aiOnly"
+  | "bankroll.title" | "bankroll.subtitle"
+  | "demo.title" | "demo.bets" | "demo.simulationTab";
 
-type Translations = Record<TranslationKeys, string>;
+
+type Translations = Partial<Record<TranslationKeys, string>> & Record<string, string>;
 
 export const translations: Record<Language, Translations> = {
   en: {
@@ -129,6 +175,159 @@ export const translations: Record<Language, Translations> = {
     "theme.light": "Light",
     "theme.dark": "Dark",
     "lang.language": "Language",
+    // Sidebar
+    "dash.todaysMatches": "Today's Matches",
+    "dash.demoBetting": "Demo Betting",
+    "dash.betTracker": "Bet Tracker",
+    "dash.bankroll": "Bankroll",
+    "dash.commandCenter": "Command Center",
+    // Dashboard
+    "dash.welcomeBack": "Welcome back,",
+    "dash.liveData": "Live CS2 match data & AI predictions — powered by real-time intel.",
+    "dash.upcomingMatches": "Upcoming Matches",
+    "dash.aiPredictions": "AI Match Predictions",
+    "dash.viewAll": "View All",
+    "dash.allPredictions": "All Predictions",
+    "dash.analyzing": "Analyzing…",
+    "dash.viewAnalysis": "View Analysis",
+    "dash.bestValuePick": "Best Value Pick",
+    "dash.topPlayers": "Top Rated Players",
+    "dash.liveMatches": "Live Matches",
+    "dash.compareOdds": "Compare Odds",
+    "dash.simulation": "Simulation",
+    "dash.demoBettingWidget": "Demo Betting",
+    "dash.noPredictions": "No predictions available yet.",
+    // Matches
+    "matches.allMatches": "All Matches",
+    "matches.liveNow": "Live Now",
+    "matches.majors": "Majors",
+    "matches.tier1": "Tier 1",
+    "matches.favorites": "Favorites",
+    "matches.grandFinal": "Grand Final Feature",
+    "matches.premiumAnalysis": "Premium AI Analysis",
+    "matches.viewPredictions": "View Predictions",
+    "matches.allScheduled": "All Scheduled Matches",
+    "matches.today": "Today",
+    "matches.tournament": "Tournament",
+    "matches.format": "Format",
+    "matches.failedLoad": "Failed to load matches. Please try again.",
+    // Predictions
+    "predictions.generating": "Generating AI predictions...",
+    "predictions.unlockPro": "Unlock Pro",
+    "predictions.unlockAll": "Unlock All Predictions",
+    "predictions.freeLimit": "Free users get 3 predictions per day. Go Pro for unlimited access.",
+    "predictions.upgradePro": "Upgrade to Pro — $19.99/mo",
+    // Settings
+    "settings.profile": "Profile",
+    "settings.appearance": "Appearance",
+    "settings.timeRegion": "Time & Region",
+    "settings.notifications": "Notifications",
+    "settings.display": "Display",
+    "settings.bankrollSettings": "Bankroll Settings",
+    "settings.subscription": "Subscription",
+    "settings.security": "Security",
+    "settings.manageAccount": "Manage your account information",
+    "settings.saveProfile": "Save Profile",
+    "settings.saving": "Saving...",
+    "settings.theme": "Theme",
+    "settings.emailCantChange": "Email cannot be changed",
+    "settings.highValueAlerts": "High-value bet alerts",
+    "settings.highValueDesc": "Get notified when AI finds bets with >75% confidence",
+    "settings.oddsMovement": "Odds movement alerts",
+    "settings.oddsMovementDesc": "Alert when odds shift significantly before a match",
+    "settings.matchStarting": "Match starting soon",
+    "settings.matchStartingDesc": "Reminder 15 minutes before tracked matches",
+    "settings.predictionResults": "Prediction results",
+    "settings.predictionResultsDesc": "Notify when tracked predictions are settled",
+    "settings.savePreferences": "Save Preferences",
+    "settings.oddsFormat": "Odds Format",
+    "settings.compactMode": "Compact mode",
+    "settings.compactModeDesc": "Reduce spacing and card sizes for more data density",
+    "settings.showConfidence": "Show confidence scores",
+    "settings.showConfidenceDesc": "Display AI confidence percentages on predictions",
+    "settings.saveDisplay": "Save Display Settings",
+    "settings.startingBankroll": "Starting Bankroll ($)",
+    "settings.kellyFraction": "Kelly Fraction",
+    "settings.riskAlert": "Risk Alert Threshold (% drawdown)",
+    "settings.saveBankroll": "Save Bankroll Settings",
+    "settings.conservative": "Conservative (recommended)",
+    "settings.moderate": "Moderate risk",
+    "settings.aggressive": "Aggressive — high variance",
+    "settings.proActive": "Pro Active",
+    "settings.fullAccess": "You have full access to all premium features",
+    "settings.manageSubscription": "Manage Subscription",
+    "settings.proPlan": "Pro Plan",
+    "settings.freePlan": "Free Plan",
+    "settings.unlockFeatures": "Upgrade to unlock all features",
+    "settings.upgradeRenews": "Renews",
+    "settings.unlimitedPredictions": "Unlimited predictions",
+    "settings.realtimeData": "Real-time HLTV data",
+    "settings.mapVetoSim": "Map veto simulator",
+    "settings.playerHeatmap": "Player form heatmap",
+    "settings.bankrollManager": "Bankroll manager",
+    "settings.oddsComparison": "Odds comparison",
+    "settings.threePerDay": "3 predictions/day",
+    "settings.basicStats": "Basic stats",
+    "settings.password": "Password",
+    "settings.resetPassword": "Reset Password",
+    "settings.resetDesc": "Send a password reset link to your email",
+    "settings.signOut": "Sign Out",
+    "settings.signOutDesc": "Sign out of your account on this device",
+    "settings.dangerZone": "Danger Zone",
+    "settings.deleteAccount": "Delete Account",
+    "settings.deleteDesc": "Permanently delete your account and all associated data. This action cannot be undone.",
+    "settings.timezone": "Timezone",
+    "settings.currentTimezone": "Currently:",
+    "settings.timezoneDesc": "all match times will be displayed in this timezone",
+    "settings.customizeAppearance": "Customize the look and feel",
+    "settings.setTimezone": "Set your timezone for match times",
+    "settings.chooseAlerts": "Choose what alerts you want to receive",
+    "settings.customizeDisplay": "Customize how data is shown",
+    "settings.configureBankroll": "Configure your money management parameters",
+    "settings.managePlan": "Manage your plan and billing",
+    "settings.manageSecurityDesc": "Manage your account security",
+    // Common
+    "common.vs": "VS",
+    "common.rank": "Rank",
+    "common.refresh": "Refresh",
+    "common.refreshing": "Refreshing...",
+    // Today's Matches
+    "today.title": "Today's CS2 Matches",
+    "today.staleWarning": "Data may be outdated",
+    "today.staleDesc": "Some match data hasn't been updated in over 15 minutes. Scores and statuses may not be current.",
+    "today.live": "Live",
+    "today.upcoming": "Upcoming",
+    "today.finished": "Finished",
+    "today.noMatches": "No matches found for today",
+    "today.noMatchesDesc": "Click refresh to scrape latest match data.",
+    "today.scrapeNow": "Scrape Matches Now",
+    "today.scraping": "Scraping...",
+    "today.liveNow": "Live Now",
+    "today.matchesCount": "matches",
+    // Bet Tracker
+    "tracker.title": "Bet Tracker",
+    "tracker.subtitle": "Track every AI prediction's result. Measure real profitability.",
+    "tracker.winRate": "Win Rate",
+    "tracker.profitLoss": "Profit / Loss",
+    "tracker.roi": "ROI",
+    "tracker.totalBets": "Total Bets",
+    "tracker.streak": "Streak",
+    "tracker.bankrollGrowth": "Bankroll Growth",
+    "tracker.resultsBreakdown": "Results Breakdown",
+    "tracker.winRateByType": "Win Rate by Bet Type",
+    "tracker.history": "Prediction History",
+    "tracker.all": "All",
+    "tracker.noTracked": "No predictions tracked yet. Save predictions from match analysis to start tracking.",
+    "tracker.noFilter": "No predictions match this filter.",
+    "tracker.liveData": "LIVE DATA",
+    "tracker.aiOnly": "AI-only",
+    // Bankroll
+    "bankroll.title": "Bankroll Manager",
+    "bankroll.subtitle": "Track your bankroll performance",
+    // Demo Betting
+    "demo.title": "Demo Betting",
+    "demo.bets": "Bets",
+    "demo.simulationTab": "Simulation",
   },
   he: {
     "nav.features": "תכונות",
@@ -227,6 +426,149 @@ export const translations: Record<Language, Translations> = {
     "theme.light": "בהיר",
     "theme.dark": "כהה",
     "lang.language": "שפה",
+    "dash.todaysMatches": "משחקי היום",
+    "dash.demoBetting": "הימורי דמו",
+    "dash.betTracker": "מעקב הימורים",
+    "dash.bankroll": "ניהול בנקרול",
+    "dash.commandCenter": "מרכז פיקוד",
+    "dash.welcomeBack": "ברוך שובך,",
+    "dash.liveData": "נתוני משחקי CS2 חיים ותחזיות AI — מונע על ידי מודיעין בזמן אמת.",
+    "dash.upcomingMatches": "משחקים קרובים",
+    "dash.aiPredictions": "תחזיות AI למשחקים",
+    "dash.viewAll": "צפה בהכל",
+    "dash.allPredictions": "כל התחזיות",
+    "dash.analyzing": "מנתח…",
+    "dash.viewAnalysis": "צפה בניתוח",
+    "dash.bestValuePick": "בחירת הערך הטובה ביותר",
+    "dash.topPlayers": "שחקנים מדורגים",
+    "dash.liveMatches": "משחקים חיים",
+    "dash.compareOdds": "השווה קואפיציינטים",
+    "dash.simulation": "סימולציה",
+    "dash.demoBettingWidget": "הימורי דמו",
+    "dash.noPredictions": "אין תחזיות זמינות עדיין.",
+    "matches.allMatches": "כל המשחקים",
+    "matches.liveNow": "עכשיו חי",
+    "matches.majors": "מג'ורים",
+    "matches.tier1": "שכבה 1",
+    "matches.favorites": "מועדפים",
+    "matches.grandFinal": "גמר גדול",
+    "matches.premiumAnalysis": "ניתוח AI פרימיום",
+    "matches.viewPredictions": "צפה בתחזיות",
+    "matches.allScheduled": "כל המשחקים המתוכננים",
+    "matches.today": "היום",
+    "matches.tournament": "טורניר",
+    "matches.format": "פורמט",
+    "matches.failedLoad": "טעינת המשחקים נכשלה. נסה שנית.",
+    "predictions.generating": "מייצר תחזיות AI...",
+    "predictions.unlockPro": "שחרר Pro",
+    "predictions.unlockAll": "שחרר את כל התחזיות",
+    "predictions.freeLimit": "משתמשים חינמיים מקבלים 3 תחזיות ביום. שדרג ל-Pro לגישה בלתי מוגבלת.",
+    "predictions.upgradePro": "שדרג ל-Pro — $19.99/חודש",
+    "settings.profile": "פרופיל",
+    "settings.appearance": "מראה",
+    "settings.timeRegion": "זמן ואזור",
+    "settings.notifications": "התראות",
+    "settings.display": "תצוגה",
+    "settings.bankrollSettings": "הגדרות בנקרול",
+    "settings.subscription": "מנוי",
+    "settings.security": "אבטחה",
+    "settings.manageAccount": "נהל את פרטי החשבון שלך",
+    "settings.saveProfile": "שמור פרופיל",
+    "settings.saving": "שומר...",
+    "settings.theme": "ערכת נושא",
+    "settings.emailCantChange": "לא ניתן לשנות אימייל",
+    "settings.highValueAlerts": "התראות הימורי ערך גבוה",
+    "settings.highValueDesc": "קבל התראה כאשר AI מוצא הימורים עם >75% ביטחון",
+    "settings.oddsMovement": "התראות תנועת קואפיציינטים",
+    "settings.oddsMovementDesc": "התראה כאשר קואפיציינטים משתנים משמעותית לפני משחק",
+    "settings.matchStarting": "משחק מתחיל בקרוב",
+    "settings.matchStartingDesc": "תזכורת 15 דקות לפני משחקים במעקב",
+    "settings.predictionResults": "תוצאות תחזיות",
+    "settings.predictionResultsDesc": "הודע כאשר תחזיות במעקב נקבעות",
+    "settings.savePreferences": "שמור העדפות",
+    "settings.oddsFormat": "פורמט קואפיציינטים",
+    "settings.compactMode": "מצב קומפקטי",
+    "settings.compactModeDesc": "הפחת מרווחים וגדלי כרטיסים לצפיפות נתונים גבוהה יותר",
+    "settings.showConfidence": "הצג ציוני ביטחון",
+    "settings.showConfidenceDesc": "הצג אחוזי ביטחון AI בתחזיות",
+    "settings.saveDisplay": "שמור הגדרות תצוגה",
+    "settings.startingBankroll": "בנקרול התחלתי ($)",
+    "settings.kellyFraction": "חלק קלי",
+    "settings.riskAlert": "סף התראת סיכון (% ירידה)",
+    "settings.saveBankroll": "שמור הגדרות בנקרול",
+    "settings.conservative": "שמרני (מומלץ)",
+    "settings.moderate": "סיכון בינוני",
+    "settings.aggressive": "אגרסיבי — תנודתיות גבוהה",
+    "settings.proActive": "Pro פעיל",
+    "settings.fullAccess": "יש לך גישה מלאה לכל התכונות הפרימיום",
+    "settings.manageSubscription": "נהל מנוי",
+    "settings.proPlan": "תוכנית Pro",
+    "settings.freePlan": "תוכנית חינמית",
+    "settings.unlockFeatures": "שדרג לפתיחת כל התכונות",
+    "settings.upgradeRenews": "מתחדש",
+    "settings.unlimitedPredictions": "תחזיות ללא הגבלה",
+    "settings.realtimeData": "נתוני HLTV בזמן אמת",
+    "settings.mapVetoSim": "סימולטור ווטו מפות",
+    "settings.playerHeatmap": "מפת חום שחקנים",
+    "settings.bankrollManager": "מנהל בנקרול",
+    "settings.oddsComparison": "השוואת קואפיציינטים",
+    "settings.threePerDay": "3 תחזיות ביום",
+    "settings.basicStats": "סטטיסטיקות בסיסיות",
+    "settings.password": "סיסמה",
+    "settings.resetPassword": "אפס סיסמה",
+    "settings.resetDesc": "שלח קישור איפוס סיסמה לאימייל שלך",
+    "settings.signOut": "התנתק",
+    "settings.signOutDesc": "התנתק מהחשבון שלך במכשיר זה",
+    "settings.dangerZone": "אזור מסוכן",
+    "settings.deleteAccount": "מחק חשבון",
+    "settings.deleteDesc": "מחק לצמיתות את החשבון שלך וכל הנתונים המשויכים. פעולה זו לא ניתנת לביטול.",
+    "settings.timezone": "אזור זמן",
+    "settings.currentTimezone": "נוכחי:",
+    "settings.timezoneDesc": "כל זמני המשחקים יוצגו באזור זמן זה",
+    "settings.customizeAppearance": "התאם את המראה והתחושה",
+    "settings.setTimezone": "הגדר את אזור הזמן שלך לזמני משחקים",
+    "settings.chooseAlerts": "בחר אילו התראות אתה רוצה לקבל",
+    "settings.customizeDisplay": "התאם אישית את תצוגת הנתונים",
+    "settings.configureBankroll": "הגדר את פרמטרי ניהול הכסף שלך",
+    "settings.managePlan": "נהל את התוכנית והחיוב שלך",
+    "settings.manageSecurityDesc": "נהל את אבטחת החשבון שלך",
+    "common.vs": "נגד",
+    "common.rank": "דירוג",
+    "common.refresh": "רענן",
+    "common.refreshing": "מרענן...",
+    "today.title": "משחקי CS2 של היום",
+    "today.staleWarning": "הנתונים עשויים להיות מיושנים",
+    "today.staleDesc": "חלק מנתוני המשחקים לא עודכנו ביותר מ-15 דקות.",
+    "today.live": "חי",
+    "today.upcoming": "קרוב",
+    "today.finished": "הסתיים",
+    "today.noMatches": "לא נמצאו משחקים להיום",
+    "today.noMatchesDesc": "לחץ על רענן לקבלת נתוני משחקים עדכניים.",
+    "today.scrapeNow": "סרוק משחקים עכשיו",
+    "today.scraping": "סורק...",
+    "today.liveNow": "עכשיו חי",
+    "today.matchesCount": "משחקים",
+    "tracker.title": "מעקב הימורים",
+    "tracker.subtitle": "עקוב אחר תוצאות כל תחזית AI. מדוד רווחיות אמיתית.",
+    "tracker.winRate": "אחוז ניצחון",
+    "tracker.profitLoss": "רווח / הפסד",
+    "tracker.roi": "ROI",
+    "tracker.totalBets": "סה\"כ הימורים",
+    "tracker.streak": "רצף",
+    "tracker.bankrollGrowth": "צמיחת בנקרול",
+    "tracker.resultsBreakdown": "פירוט תוצאות",
+    "tracker.winRateByType": "אחוז ניצחון לפי סוג",
+    "tracker.history": "היסטוריית תחזיות",
+    "tracker.all": "הכל",
+    "tracker.noTracked": "אין תחזיות במעקב עדיין. שמור תחזיות מניתוח משחקים כדי להתחיל.",
+    "tracker.noFilter": "אין תחזיות התואמות לסינון זה.",
+    "tracker.liveData": "נתונים חיים",
+    "tracker.aiOnly": "AI בלבד",
+    "bankroll.title": "מנהל בנקרול",
+    "bankroll.subtitle": "עקוב אחר ביצועי הבנקרול שלך",
+    "demo.title": "הימורי דמו",
+    "demo.bets": "הימורים",
+    "demo.simulationTab": "סימולציה",
   },
   ar: {
     "nav.features": "المميزات",
