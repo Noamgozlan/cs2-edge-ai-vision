@@ -155,7 +155,7 @@ const DashboardSidebar = () => {
                 onClick={openPortal}
                 className="w-full py-2 rounded-lg text-[11px] font-bold text-foreground bg-muted hover:bg-muted/80 transition-all"
               >
-                Manage Subscription
+                {t("settings.manageSubscription" as any)}
               </button>
             </>
           ) : (
