@@ -267,7 +267,7 @@ function MatchCard({ match: m, index, formatTime }: {
 
         {/* Tournament */}
         <div className="hidden lg:flex flex-col items-center gap-0.5 w-40 shrink-0">
-          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Tournament</span>
+          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{t("matches.tournament" as any)}</span>
           <span className="text-xs font-semibold text-center truncate w-full">{m.tournament_name || "—"}</span>
         </div>
 
