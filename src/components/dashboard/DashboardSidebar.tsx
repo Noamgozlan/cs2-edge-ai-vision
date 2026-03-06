@@ -165,7 +165,7 @@ const DashboardSidebar = () => {
                 <span className="text-xs font-bold text-foreground">{t("settings.proPlan" as any)}</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-                Unlock real-time edge data & unlimited AI predictions
+                {t("settings.unlockFeatures" as any)}
               </p>
               <button
                 onClick={openCheckout}
