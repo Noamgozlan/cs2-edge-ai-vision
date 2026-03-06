@@ -140,7 +140,7 @@ const TodaysMatches = () => {
           {liveMatches.length > 0 && (
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 font-bold">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              {liveMatches.length} Live
+              {liveMatches.length} {t("today.live" as any)}
             </span>
           )}
           <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
