@@ -282,7 +282,7 @@ const Dashboard = () => {
                 <h2 className="text-sm font-bold">{t("dash.upcomingMatches")}</h2>
               </div>
               <Link to="/dashboard/matches" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
-                View All <ArrowUpRight className="w-3 h-3" />
+                {t("dash.viewAll")} <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
 
