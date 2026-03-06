@@ -180,12 +180,12 @@ const TodaysMatches = () => {
 
       {/* Live Matches */}
       {liveMatches.length > 0 && (
-        <MatchSection title="Live Now" icon="🔴" matches={liveMatches} formatTime={formatTime} />
+        <MatchSection title={t("today.liveNow" as any)} icon="🔴" matches={liveMatches} formatTime={formatTime} t={t} />
       )}
 
       {/* Upcoming Matches */}
       {upcomingMatches.length > 0 && (
-        <MatchSection title="Upcoming" icon="⏰" matches={upcomingMatches} formatTime={formatTime} />
+        <MatchSection title={t("today.upcoming" as any)} icon="⏰" matches={upcomingMatches} formatTime={formatTime} t={t} />
       )}
 
     </div>
