@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Wifi, WifiOff, Clock, Trophy, Zap, AlertTriangle, RefreshCw } from "lucide-react";
 import { TeamLogo } from "@/lib/team-logos";
 import { useTimezone } from "@/contexts/TimezoneContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
