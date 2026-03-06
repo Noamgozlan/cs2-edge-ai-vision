@@ -29,7 +29,6 @@ serve(async (req) => {
       "meta-llama/llama-4-maverick:free",
       "deepseek/deepseek-chat-v3-0324:free",
       "google/gemma-3-27b-it:free",
-      "microsoft/phi-4:free",
     ];
 
     const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
