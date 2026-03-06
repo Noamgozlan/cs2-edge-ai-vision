@@ -113,7 +113,7 @@ const TodaysMatches = () => {
           className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border text-sm font-bold text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Refreshing..." : "Refresh"}
+          {isRefreshing ? t("common.refreshing" as any) : t("common.refresh" as any)}
         </button>
       </div>
 
