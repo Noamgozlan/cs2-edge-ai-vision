@@ -188,10 +188,6 @@ const TodaysMatches = () => {
         <MatchSection title="Upcoming" icon="⏰" matches={upcomingMatches} formatTime={formatTime} />
       )}
 
-      {/* Finished Matches */}
-      {finishedMatches.length > 0 && (
-        <MatchSection title="Finished" icon="✅" matches={finishedMatches} formatTime={formatTime} />
-      )}
     </div>
   );
 };
