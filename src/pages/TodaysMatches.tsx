@@ -71,9 +71,10 @@ const TodaysMatches = () => {
     return Date.now() - updated > 15 * 60 * 1000;
   });
 
-  const liveMatches = matches.filter((m) => m.status === "live");
-  const upcomingMatches = matches.filter((m) => m.status === "upcoming");
-  const finishedMatches = matches.filter((m) => m.status === "finished");
+  // Only show bettable matches (live + upcoming)
+  const bettableMatches = matches.filter((m) => m.status !== "finished");
+  const liveMatches = bettableMatches.filter((m) => m.status === "live");
+  const upcomingMatches = bettableMatches.filter((m) => m.status === "upcoming");
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
