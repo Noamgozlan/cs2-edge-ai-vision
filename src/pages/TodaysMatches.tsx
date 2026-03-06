@@ -205,7 +205,7 @@ function MatchSection({ title, icon, matches, formatTime }: {
           <span>{icon}</span> {title}
         </span>
         <div className="h-px flex-1 bg-border" />
-        <span className="text-[10px] text-muted-foreground font-bold">{matches.length} matches</span>
+        <span className="text-[10px] text-muted-foreground font-bold">{matches.length} {t("today.matchesCount" as any)}</span>
       </div>
 
       <div className="space-y-2">
