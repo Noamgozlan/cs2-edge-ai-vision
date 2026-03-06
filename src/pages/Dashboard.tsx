@@ -5,11 +5,11 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTimezone } from "@/contexts/TimezoneContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchMatches, fetchAIAnalysis, Match } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { TeamLogo } from "@/lib/team-logos";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
