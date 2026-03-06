@@ -17,3 +17,12 @@ verify_jwt = false
 
 [functions.customer-portal]
 verify_jwt = false
+
+[functions.ai-discover-matches]
+verify_jwt = false
+
+[functions.scrape-cs2-matches]
+verify_jwt = false
+
+[functions.cs2-matches-api]
+verify_jwt = false
