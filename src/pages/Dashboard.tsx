@@ -475,7 +475,7 @@ const Dashboard = () => {
                 <div className="space-y-3">
                   <div className="rounded-xl p-3 bg-primary/10 border border-primary/20">
                     <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">
-                      🎯 {bestPick.analysis.prediction.confidence}% Confidence
+                      🎯 {bestPick.analysis.prediction.confidence}% {t("match.confidence")}
                     </p>
                     <p className="text-sm font-bold mb-1.5">{bestPick.analysis.prediction.recommendedBet}</p>
                     <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">
