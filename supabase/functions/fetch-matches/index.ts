@@ -19,12 +19,13 @@ serve(async (req) => {
     const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
-    // Fetch matches from cs2_matches table (populated by AI scanner)
+    // Fetch only bettable matches (upcoming + live, not finished)
     const { data: dbMatches, error } = await supabase
       .from("cs2_matches")
       .select("*")
       .gte("start_time_utc", todayStart.toISOString())
       .lt("start_time_utc", todayEnd.toISOString())
+      .neq("status", "finished")
       .order("start_time_utc", { ascending: true });
 
     if (error) {

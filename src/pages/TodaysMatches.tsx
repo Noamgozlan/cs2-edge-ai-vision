@@ -163,7 +163,7 @@ const TodaysMatches = () => {
         </div>
       )}
 
-      {!isLoading && matches.length === 0 && !error && (
+      {!isLoading && bettableMatches.length === 0 && !error && (
         <div className="text-center py-16 space-y-4">
           <WifiOff className="w-12 h-12 text-muted-foreground mx-auto" />
           <p className="text-lg font-bold text-muted-foreground">{t("today.noMatches" as any)}</p>
