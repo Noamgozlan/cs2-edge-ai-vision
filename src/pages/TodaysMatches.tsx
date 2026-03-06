@@ -102,7 +102,7 @@ const TodaysMatches = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-black tracking-tight">Today's CS2 Matches</h1>
+          <h1 className="text-2xl font-black tracking-tight">{t("today.title" as any)}</h1>
           <span className="text-[10px] font-black uppercase tracking-widest bg-accent/20 text-accent px-2.5 py-1 rounded-full">
             {timezoneLabel}
           </span>
