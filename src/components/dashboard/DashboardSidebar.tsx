@@ -171,7 +171,7 @@ const DashboardSidebar = () => {
                 onClick={openCheckout}
                 className="w-full py-2 rounded-lg text-[11px] font-bold text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all shadow-md shadow-primary/20"
               >
-                Go Premium — $19.99/mo
+                {t("predictions.upgradePro" as any)}
               </button>
             </>
           )}
