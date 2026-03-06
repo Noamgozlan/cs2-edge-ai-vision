@@ -24,6 +24,14 @@ serve(async (req) => {
     const today = new Date().toISOString().slice(0, 10);
     log(`Scanning for CS2 matches on ${today} via OpenRouter...`);
 
+    // Use OpenRouter's fallback routing across free models
+    const freeModels = [
+      "meta-llama/llama-4-maverick:free",
+      "deepseek/deepseek-chat-v3-0324:free",
+      "google/gemma-3-27b-it:free",
+      "microsoft/phi-4:free",
+    ];
+
     const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -32,20 +40,8 @@ serve(async (req) => {
         "HTTP-Referer": "https://cs2-edge-ai-vision.lovable.app",
         "X-Title": "CS2 Edge AI",
       },
-      // Try multiple free models in order of quality
-      const freeModels = [
-        "meta-llama/llama-4-maverick:free",
-        "deepseek/deepseek-chat-v3-0324:free",
-        "google/gemma-3-27b-it:free",
-        "microsoft/phi-4:free",
-      ];
-
-      // Try first model, fallback handled by OpenRouter's model routing
-      const selectedModel = freeModels[0];
-      log(`Using model: ${selectedModel}`);
-
       body: JSON.stringify({
-        model: selectedModel,
+        model: freeModels[0],
         models: freeModels,
         route: "fallback",
         messages: [
@@ -57,7 +53,7 @@ IMPORTANT: Return ONLY valid JSON, no markdown, no code blocks, no explanation. 
 
 Each match object must have these fields:
 - "team1": string (official team name)
-- "team2": string (official team name)  
+- "team2": string (official team name)
 - "tournament": string (event/tournament name)
 - "start_time_utc": string (HH:MM in UTC 24h format)
 - "format": string (bo1, bo3, or bo5)
@@ -80,7 +76,6 @@ Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, F
       const status = aiResponse.status;
       const body = await aiResponse.text();
       logError(`OpenRouter error ${status}: ${body}`);
-      
       if (status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited, please try again later" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -90,18 +85,17 @@ Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, F
     }
 
     const aiData = await aiResponse.json();
-    log(`OpenRouter response received`);
+    const usedModel = aiData.model || "unknown";
+    log(`Response from model: ${usedModel}`);
 
     const content = aiData.choices?.[0]?.message?.content || "";
-    log(`Raw AI content length: ${content.length}`);
+    log(`Raw content length: ${content.length}`);
 
-    // Parse JSON from the response - handle markdown code blocks
+    // Parse JSON from response
     let aiMatches: any[] = [];
     try {
-      // Try direct parse first
       aiMatches = JSON.parse(content);
     } catch {
-      // Try extracting JSON from markdown code blocks or text
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         try {
@@ -114,26 +108,23 @@ Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, F
         }
       } else {
         logError("No JSON array found in AI response");
-        return new Response(JSON.stringify({ error: "AI did not return valid match data", raw: content.slice(0, 500) }), {
+        return new Response(JSON.stringify({ error: "No match data in AI response", raw: content.slice(0, 500) }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
     }
 
     if (!Array.isArray(aiMatches)) aiMatches = [];
-    log(`AI found ${aiMatches.length} matches for ${today}`);
+    log(`Found ${aiMatches.length} matches`);
 
     if (aiMatches.length === 0) {
       return new Response(JSON.stringify({
-        success: true,
-        source: "openrouter",
-        matchesFound: 0,
-        matchesUpserted: 0,
-        date: today,
+        success: true, source: "openrouter", model: usedModel,
+        matchesFound: 0, matchesUpserted: 0, date: today,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Upsert matches into database
+    // Upsert matches
     let upserted = 0;
     for (const m of aiMatches) {
       if (!m.team1 || !m.team2) continue;
@@ -143,31 +134,25 @@ Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, F
         const timeParts = m.start_time_utc.match(/(\d{1,2}):(\d{2})/);
         if (timeParts) {
           const dt = new Date(`${today}T${timeParts[1].padStart(2, "0")}:${timeParts[2]}:00Z`);
-          if (!isNaN(dt.getTime())) {
-            startTimeUtc = dt.toISOString();
-          }
+          if (!isNaN(dt.getTime())) startTimeUtc = dt.toISOString();
         }
       }
 
       const sourceId = `ai-${m.team1}-${m.team2}-${today}`.replace(/\s+/g, "-").toLowerCase();
 
-      const { error } = await supabase
-        .from("cs2_matches")
-        .upsert({
-          source: "openrouter-ai",
-          source_match_id: sourceId,
-          start_time_utc: startTimeUtc,
-          team1_name: m.team1.trim(),
-          team2_name: m.team2.trim(),
-          tournament_name: m.tournament || "CS2 Match",
-          match_format: m.format || "bo3",
-          status: m.status || "upcoming",
-          score: m.score || null,
-          last_updated_utc: new Date().toISOString(),
-          is_stale: false,
-        }, {
-          onConflict: "source,source_match_id",
-        });
+      const { error } = await supabase.from("cs2_matches").upsert({
+        source: "openrouter-ai",
+        source_match_id: sourceId,
+        start_time_utc: startTimeUtc,
+        team1_name: m.team1.trim(),
+        team2_name: m.team2.trim(),
+        tournament_name: m.tournament || "CS2 Match",
+        match_format: m.format || "bo3",
+        status: m.status || "upcoming",
+        score: m.score || null,
+        last_updated_utc: new Date().toISOString(),
+        is_stale: false,
+      }, { onConflict: "source,source_match_id" });
 
       if (error) {
         logError(`Upsert error for ${m.team1} vs ${m.team2}: ${error.message}`);
@@ -180,13 +165,9 @@ Include tier 1 and tier 2 matches from: BLAST, IEM, ESL Pro League, PGL Major, F
     log(`Done: ${upserted}/${aiMatches.length} matches upserted in ${elapsed}ms`);
 
     return new Response(JSON.stringify({
-      success: true,
-      source: "openrouter",
-      model: "google/gemma-3-27b-it:free",
-      matchesFound: aiMatches.length,
-      matchesUpserted: upserted,
-      date: today,
-      elapsedMs: elapsed,
+      success: true, source: "openrouter", model: usedModel,
+      matchesFound: aiMatches.length, matchesUpserted: upserted,
+      date: today, elapsedMs: elapsed,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   } catch (error) {
