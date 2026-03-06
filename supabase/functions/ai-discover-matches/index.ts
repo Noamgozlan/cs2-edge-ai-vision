@@ -34,7 +34,7 @@ serve(async (req) => {
         "X-Title": "CS2 Edge AI",
       },
       body: JSON.stringify({
-        model: "qwen/qwen3-235b-a22b:free",
+        model: "deepseek/deepseek-r1-0528:free",
         messages: [
           {
             role: "system",
