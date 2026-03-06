@@ -146,7 +146,7 @@ const DashboardSidebar = () => {
             <>
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle2 className="w-4 h-4 text-accent" />
-                <span className="text-xs font-bold text-accent">Pro Active</span>
+                <span className="text-xs font-bold text-accent">{t("settings.proActive" as any)}</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
                 You have full access to all premium features
