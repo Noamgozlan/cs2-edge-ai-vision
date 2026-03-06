@@ -409,7 +409,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-primary" />
-                    <h2 className="text-sm font-bold">Demo Betting</h2>
+                    <h2 className="text-sm font-bold">{t("dash.demoBettingWidget")}</h2>
                   </div>
                   <span className={`text-xs font-bold ${betStats.profit >= 0 ? "text-accent" : "text-destructive"}`}>
                     {betStats.profit >= 0 ? "+" : ""}${betStats.profit.toFixed(2)}
