@@ -34,9 +34,8 @@ serve(async (req) => {
         "X-Title": "CS2 Edge AI",
       },
       body: JSON.stringify({
-        model: freeModels[0],
-        models: freeModels,
-        route: "fallback",
+        model: "meta-llama/llama-4-scout:free",
+        messages: [
         messages: [
           {
             role: "system",
