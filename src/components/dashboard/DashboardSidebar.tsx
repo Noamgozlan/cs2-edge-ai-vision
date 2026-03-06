@@ -64,7 +64,6 @@ const DashboardSidebar = () => {
         <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] px-3 mb-3">
           {t("dash.commandCenter" as any)}
         </p>
-        </p>
         {navItems.map((item) => {
           const active = location.pathname === item.url ||
             (item.url !== "/dashboard" && location.pathname.startsWith(item.url));
