@@ -169,8 +169,8 @@ const TodaysMatches = () => {
       {!isLoading && matches.length === 0 && !error && (
         <div className="text-center py-16 space-y-4">
           <WifiOff className="w-12 h-12 text-muted-foreground mx-auto" />
-          <p className="text-lg font-bold text-muted-foreground">No matches found for today</p>
-          <p className="text-sm text-muted-foreground">Click refresh to scrape latest match data.</p>
+          <p className="text-lg font-bold text-muted-foreground">{t("today.noMatches" as any)}</p>
+          <p className="text-sm text-muted-foreground">{t("today.noMatchesDesc" as any)}</p>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
