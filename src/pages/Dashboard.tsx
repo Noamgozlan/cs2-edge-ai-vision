@@ -111,12 +111,26 @@ function useDemoBetStats() {
 const Dashboard = () => {
   const { t } = useLanguage();
   const { convertTime } = useTimezone();
+  const queryClient = useQueryClient();
+  const hasTriggeredScan = useRef(false);
 
   const { data: matches, isLoading: matchesLoading } = useQuery({
     queryKey: ["matches"],
     queryFn: fetchMatches,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Auto-trigger AI scan if no matches found
+  useEffect(() => {
+    if (!matchesLoading && matches && matches.length === 0 && !hasTriggeredScan.current) {
+      hasTriggeredScan.current = true;
+      console.log("[Dashboard] No matches found, triggering AI scan...");
+      supabase.functions.invoke("ai-discover-matches").then(() => {
+        // Refetch matches after scan completes
+        queryClient.invalidateQueries({ queryKey: ["matches"] });
+      }).catch(err => console.error("AI scan failed:", err));
+    }
+  }, [matches, matchesLoading, queryClient]);
 
   const { data: predictions, isLoading: predictionsLoading } = useTopPredictions(matches, 4);
   const { data: betStats } = useDemoBetStats();
