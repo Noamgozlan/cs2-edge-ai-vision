@@ -62,7 +62,8 @@ const DashboardSidebar = () => {
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-0.5 relative z-10">
         <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] px-3 mb-3">
-          Command Center
+          {t("dash.commandCenter" as any)}
+        </p>
         </p>
         {navItems.map((item) => {
           const active = location.pathname === item.url ||
