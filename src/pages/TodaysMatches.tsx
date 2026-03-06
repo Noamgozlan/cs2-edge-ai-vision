@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Wifi, WifiOff, Clock, Trophy, Zap, AlertTriangle, RefreshCw } from "lucide-react";
+import { Loader2, Wifi, WifiOff, Clock, Trophy, Zap, AlertTriangle, RefreshCw, ExternalLink } from "lucide-react";
 import { TeamLogo } from "@/lib/team-logos";
 import { useTimezone } from "@/contexts/TimezoneContext";
 import { useLanguage } from "@/contexts/LanguageContext";
