@@ -303,11 +303,11 @@ const Dashboard = () => {
                       to={`/dashboard/match/${m.id}?team1=${encodeURIComponent(m.team1)}&team2=${encodeURIComponent(m.team2)}&event=${encodeURIComponent(m.event)}&format=${encodeURIComponent(m.format)}&time=${encodeURIComponent(m.time)}&rank1=${m.rank1}&rank2=${m.rank2}`}
                       className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-muted/30 transition-colors group"
                     >
-                      <TeamLogo name={m.team1} size={24} />
+                      <TeamLogo name={m.team1} size={24} badgeUrl={m.team1Badge} />
                       <span className="font-semibold text-sm truncate flex-1 min-w-0">{m.team1}</span>
-                      <span className="text-[9px] font-black text-muted-foreground">VS</span>
+                      <span className="text-[9px] font-black text-muted-foreground">{t("common.vs")}</span>
                       <span className="font-semibold text-sm truncate flex-1 min-w-0 text-right">{m.team2}</span>
-                      <TeamLogo name={m.team2} size={24} />
+                      <TeamLogo name={m.team2} size={24} badgeUrl={m.team2Badge} />
                       <div className="hidden sm:flex items-center gap-2 ml-2">
                         <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted font-bold text-muted-foreground">{m.format}</span>
                         <span className="text-xs font-bold text-primary">{convertTime(m.time)}</span>
