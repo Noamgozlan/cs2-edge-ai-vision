@@ -565,7 +565,7 @@ const Dashboard = () => {
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-center">
                 <BarChart3 className="w-4 h-4 mx-auto mb-1.5 text-accent" />
-                <p className="text-[10px] font-bold">Compare Odds</p>
+                <p className="text-[10px] font-bold">{t("dash.compareOdds")}</p>
               </motion.div>
             </Link>
             <Link to="/dashboard/demo-betting?tab=simulation">
