@@ -162,7 +162,7 @@ const DashboardSidebar = () => {
             <>
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-4 h-4 text-primary" />
-                <span className="text-xs font-bold text-foreground">Pro Plan</span>
+                <span className="text-xs font-bold text-foreground">{t("settings.proPlan" as any)}</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
                 Unlock real-time edge data & unlimited AI predictions
