@@ -14,17 +14,38 @@ const ResetPassword = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Supabase auto-handles the recovery token in the URL hash and emits a SIGNED_IN / PASSWORD_RECOVERY event.
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+    // Listen for recovery / sign-in events
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN" || session) {
         setReady(true);
       }
     });
-    // Also check existing session in case event already fired
+
+    // Manually parse recovery tokens from URL hash (Supabase sometimes needs this)
+    const hash = window.location.hash;
+    if (hash && hash.includes("access_token")) {
+      const params = new URLSearchParams(hash.replace(/^#/, ""));
+      const access_token = params.get("access_token");
+      const refresh_token = params.get("refresh_token");
+      if (access_token && refresh_token) {
+        supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
+          if (!error) setReady(true);
+        });
+      }
+    }
+
+    // Check existing session
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true);
     });
-    return () => sub.subscription.unsubscribe();
+
+    // Safety: enable form after 2s so user is never permanently locked out
+    const fallback = setTimeout(() => setReady(true), 2000);
+
+    return () => {
+      sub.subscription.unsubscribe();
+      clearTimeout(fallback);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
