@@ -13,6 +13,7 @@ import type { Session } from "@supabase/supabase-js";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import DashboardLayout from "./pages/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Matches from "./pages/Matches";
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={<AuthGuard><DashboardLayout /></AuthGuard>}>
                   <Route index element={<Dashboard />} />
                   <Route path="matches" element={<Matches />} />
