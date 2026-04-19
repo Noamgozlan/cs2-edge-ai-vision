@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.cs2-matches-api]
 verify_jwt = false
+
+[functions.pandascore-matches]
+verify_jwt = false
