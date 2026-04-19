@@ -43,6 +43,22 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const targetEmail = email.trim() || window.prompt("Enter your email to reset your password:")?.trim() || "";
+    if (!targetEmail) {
+      toast({ title: "Email required", description: "Please enter your email address first.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast({ title: "Reset failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Check your email", description: `Password reset link sent to ${targetEmail}.` });
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
@@ -106,7 +122,7 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-sm font-semibold">Password</label>
-                <button type="button" className="text-xs font-bold text-primary hover:text-primary/80 transition-colors">
+                <button type="button" onClick={handleForgotPassword} className="text-xs font-bold text-primary hover:text-primary/80 transition-colors">
                   Forgot Password?
                 </button>
               </div>
