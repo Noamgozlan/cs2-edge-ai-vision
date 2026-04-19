@@ -32,7 +32,25 @@ serve(async (req) => {
       console.error("DB query error:", error);
     }
 
-    const allMatches = dbMatches || [];
+    let allMatches = dbMatches || [];
+
+    // If DB empty, trigger PandaScore sync first, then re-query
+    if (allMatches.length === 0) {
+      console.log("DB empty, triggering PandaScore sync...");
+      try {
+        await supabase.functions.invoke("pandascore-matches");
+        const { data: refreshed } = await supabase
+          .from("cs2_matches")
+          .select("*")
+          .gte("start_time_utc", todayStart.toISOString())
+          .lt("start_time_utc", todayEnd.toISOString())
+          .neq("status", "finished")
+          .order("start_time_utc", { ascending: true });
+        allMatches = refreshed || [];
+      } catch (e) {
+        console.error("PandaScore sync error:", e);
+      }
+    }
 
     if (allMatches.length > 0) {
       console.log(`Returning ${allMatches.length} matches from database`);
