@@ -53,7 +53,7 @@ const Navbar = () => {
                 <Zap className="h-4 w-4 text-white" />
               </div>
               <div className="hidden sm:block">
-                <p className="font-landing-display text-sm font-semibold text-white tracking-tight">Gozlan BETS</p>
+                <p className="font-landing-display text-sm font-semibold text-white tracking-tight">CS2Edge</p>
                 <p className="text-[10px] font-medium text-white/40">CS2 trading intelligence</p>
               </div>
             </Link>

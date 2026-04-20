@@ -92,7 +92,7 @@ const HeroSection = () => {
               transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
               className="mt-6 max-w-[58ch] text-base leading-8 text-white/55 sm:text-lg"
             >
-              Gozlan BETS turns live CS2 data into bookmaker-ready conviction — cleaner market
+              CS2Edge turns live CS2 data into bookmaker-ready conviction — cleaner market
               comparison, stronger player prop analysis, and premium match intelligence that feels
               closer to a trading desk than a tip sheet.
             </motion.p>

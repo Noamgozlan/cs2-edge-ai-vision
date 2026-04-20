@@ -8,7 +8,7 @@ const Footer = () => (
       <div className="landing-surface rounded-[32px] p-6 sm:p-8">
         <div className="grid gap-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr_0.75fr]">
           <div className="max-w-md">
-            <img src={gozlanLogo} alt="Gozlan BETS" className="h-12 w-auto" />
+            <img src={gozlanLogo} alt="CS2Edge" className="h-12 w-auto" />
             <p className="mt-5 text-sm leading-7 text-white/60">
               Premium CS2 betting intelligence with live match context, bookmaker comparison, and AI-driven conviction built into every step.
             </p>
@@ -50,7 +50,7 @@ const Footer = () => (
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-sm text-white/44 sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 Gozlan BETS. All rights reserved.</p>
+          <p>© 2026 CS2Edge. All rights reserved.</p>
           <p>Gamble responsibly and always compare the number before you act.</p>
         </div>
       </div>
