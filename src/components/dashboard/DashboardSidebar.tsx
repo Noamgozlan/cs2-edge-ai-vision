@@ -4,7 +4,7 @@ import {
   Sun, Moon, Globe, Crown, CircleDollarSign, Target,
   CheckCircle2, Wallet, CalendarDays, ChevronDown
 } from "lucide-react";
-import gozlanLogo from "@/assets/gozlan-logo.png";
+
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage, languages } from "@/contexts/LanguageContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
@@ -59,8 +59,11 @@ const DashboardSidebar = () => {
   return (
     <aside className="w-[240px] h-screen flex flex-col bg-sidebar border-r border-sidebar-border overflow-hidden">
       <div className="h-[57px] flex items-center px-5 border-b border-sidebar-border flex-shrink-0">
-        <Link to="/" className="flex items-center">
-          <img src={gozlanLogo} alt="CS2Edge" className="h-8 w-auto object-contain" />
+        <Link to="/" className="flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-[hsl(221,83%,58%)] text-white text-xs font-bold">
+            C
+          </div>
+          <span className="font-landing-display text-sm text-sidebar-foreground">CS2Edge</span>
         </Link>
       </div>
 

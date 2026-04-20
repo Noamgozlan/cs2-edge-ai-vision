@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -116,30 +116,47 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Geist', 'Inter', system-ui, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
-    letter-spacing: -0.01em;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1;
+    letter-spacing: -0.011em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    letter-spacing: -0.02em;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 600;
   }
 }
 
 @layer utilities {
+  /* ───────────────────────────── Typography ───────────────────────────── */
+
   .font-display {
-    font-family: 'Geist', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     letter-spacing: -0.025em;
   }
 
   .font-mono-data {
-    font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Geist Mono', monospace;
     font-feature-settings: "tnum" 1;
   }
 
+  /* Unified landing typography — same family as app, just tighter */
+  .font-landing-display {
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+
+  .font-landing-body {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* ───────────────────────────── Elevation tokens ───────────────────────────── */
+
   .surface-raised {
     @apply bg-card border border-border;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04);
   }
 
   .surface-sunken {
@@ -157,32 +174,21 @@
     @apply text-3xl font-bold tracking-tight font-mono-data;
   }
 
+  /* ───────────────────────────── Scrollbar ───────────────────────────── */
+
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
   }
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 2px; }
 
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { scrollbar-width: none; }
 
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
-    border-radius: 2px;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .scrollbar-hide {
-    scrollbar-width: none;
-  }
+  /* ───────────────────────────── Utilities ───────────────────────────── */
 
   .skeleton {
     @apply animate-pulse rounded bg-muted;
@@ -191,7 +197,6 @@
   .pressable {
     @apply transition-transform duration-100 ease-out;
   }
-
   .pressable:active {
     transform: scale(0.97);
   }
@@ -204,74 +209,68 @@
     @apply border-b border-border/60;
   }
 
-  .font-landing-display {
-    font-family: 'Sora', 'Geist', system-ui, sans-serif;
-    letter-spacing: -0.045em;
-  }
+  /* ───────────────────────────── Landing design tokens ───────────────────────────── */
 
-  .font-landing-body {
-    font-family: 'Manrope', 'Geist', system-ui, sans-serif;
-  }
+  /*
+   * Systematic opacity scale:
+   *   border:  white/[0.06]  (subtle) → white/[0.10] (default) → white/[0.14] (emphasis)
+   *   text:    white/[0.40]  (tertiary) → white/[0.55] (secondary) → white/[0.80] (primary)
+   *   surface: white/[0.03]  (subtle fill) → white/[0.05] (card fill)
+   */
 
   .landing-shell {
     background:
-      radial-gradient(ellipse 80% 40% at 50% -5%, rgba(77, 124, 255, 0.22), transparent),
-      radial-gradient(ellipse 50% 30% at 85% 8%, rgba(43, 208, 176, 0.1), transparent),
+      radial-gradient(ellipse 70% 35% at 50% -8%, rgba(77, 124, 255, 0.12), transparent),
+      radial-gradient(ellipse 40% 25% at 80% 5%, rgba(43, 208, 176, 0.06), transparent),
       #050505;
-    color: #f3f6fb;
+    color: #e8ecf4;
     min-height: 100vh;
   }
 
-  .landing-grid-bg {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-  }
-
   .landing-surface {
-    background: linear-gradient(180deg, rgba(14, 17, 26, 0.92) 0%, rgba(8, 10, 17, 0.92) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow:
-      0 20px 60px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .landing-surface-strong {
-    background: linear-gradient(180deg, rgba(16, 22, 36, 0.97) 0%, rgba(9, 13, 22, 0.97) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
-      0 32px 80px rgba(0, 0, 0, 0.6),
-      0 0 0 1px rgba(255,255,255,0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+      0 4px 24px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .landing-primary-button {
-    background: linear-gradient(135deg, #6b8cff 0%, #4d7cff 55%, #3968f6 100%);
+    background: hsl(221 83% 58%);
     color: #ffffff;
-    box-shadow: 0 0 28px rgba(77, 124, 255, 0.4), 0 16px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
   }
-
   .landing-primary-button:hover {
-    box-shadow: 0 0 40px rgba(77, 124, 255, 0.55), 0 16px 40px rgba(0,0,0,0.3);
+    background: hsl(221 83% 62%);
+    box-shadow: 0 2px 8px rgba(77, 124, 255, 0.25);
   }
 
   .landing-outline-button {
-    background: rgba(255, 255, 255, 0.03);
-    color: rgba(243, 246, 251, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: transparent;
+    color: rgba(232, 236, 244, 0.80);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    transition: background 0.15s ease;
+  }
+  .landing-outline-button:hover {
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .landing-section-label {
-    color: rgba(107, 140, 255, 0.85);
-    letter-spacing: 0.22em;
-  }
-
-  .midnight-glow {
-    box-shadow: 0 0 32px rgba(77, 124, 255, 0.35);
+    color: rgba(77, 124, 255, 0.72);
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
   }
 }

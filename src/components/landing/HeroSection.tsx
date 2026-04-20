@@ -24,314 +24,216 @@ const heroStats = [
 ];
 
 const stagger = {
-  animate: { transition: { staggerChildren: 0.09 } },
+  animate: { transition: { staggerChildren: 0.06 } },
 };
 
 const fadeUp = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0 },
 };
 
 const HeroSection = () => {
   return (
-    <section className="relative overflow-hidden pt-32 sm:pt-36 min-h-[92vh] flex items-center">
-      {/* Background glows */}
+    <section className="relative overflow-hidden pt-28 sm:pt-32">
+      {/* Subtle background glow — restrained */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[700px] rounded-full bg-[#4d7cff]/14 blur-[120px]" />
-        <div className="absolute top-20 right-[8%] h-[300px] w-[400px] rounded-full bg-[#2bd0b0]/8 blur-[80px]" />
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.028]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[600px] rounded-full bg-[hsl(221,83%,58%)]/[0.06] blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28 w-full">
-        <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+      <div className="relative mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28 w-full">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
 
           {/* Left: Copy */}
-          <motion.div
-            variants={stagger}
-            initial="initial"
-            animate="animate"
-            className="max-w-2xl"
-          >
-            {/* Eyebrow pill */}
+          <motion.div variants={stagger} initial="initial" animate="animate" className="max-w-xl">
+            {/* Eyebrow */}
             <motion.div
               variants={fadeUp}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/60"
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/[0.50]"
             >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#4d7cff]/20 text-[#9fb7ff]">
-                <Sparkles className="h-3 w-3" />
-              </span>
+              <Sparkles className="h-3 w-3 text-[hsl(221,83%,68%)]" />
               The sharper way to trade CS2 match markets
             </motion.div>
 
-            {/* H1 with gradient */}
+            {/* H1 */}
             <motion.h1
               variants={fadeUp}
-              transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              className="font-landing-display max-w-[13ch] text-[3rem] font-semibold leading-[0.93] sm:text-[4.3rem] lg:text-[5rem]"
-              style={{
-                background: "linear-gradient(135deg, #ffffff 30%, #9fb7ff 70%, #c2d0ff 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="font-landing-display text-[2.75rem] leading-[1.05] text-white sm:text-[3.5rem] lg:text-[4rem]"
             >
-              Secure. Precise. Built for profit.
+              Secure. Precise.{" "}
+              <span className="text-white/[0.55]">Built for profit.</span>
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
-              transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-6 max-w-[58ch] text-base leading-8 text-white/55 sm:text-lg"
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-5 max-w-[50ch] text-[15px] leading-7 text-white/[0.45]"
             >
               CS2Edge turns live CS2 data into bookmaker-ready conviction — cleaner market
-              comparison, stronger player prop analysis, and premium match intelligence that feels
-              closer to a trading desk than a tip sheet.
+              comparison, stronger player prop analysis, and premium match intelligence.
             </motion.p>
 
             {/* CTA row */}
             <motion.div
               variants={fadeUp}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="mt-8 flex flex-col gap-3 sm:flex-row"
             >
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#6b8cff] to-[#4d7cff] px-7 py-4 text-sm font-semibold text-white shadow-[0_0_28px_rgba(77,124,255,0.4)] transition-shadow hover:shadow-[0_0_40px_rgba(77,124,255,0.55)]"
-                >
-                  Create your workspace
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}>
-                <Link
-                  to="/dashboard/predictions"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/4 px-7 py-4 text-sm font-semibold text-white/75 transition-colors hover:bg-white/7 hover:text-white"
-                >
-                  View live predictions
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
+              <Link
+                to="/register"
+                className="landing-primary-button inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold"
+              >
+                Create your workspace
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/dashboard/predictions"
+                className="landing-outline-button inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium"
+              >
+                View live predictions
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </motion.div>
 
             {/* Trust pills */}
             <motion.div
               variants={fadeUp}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="mt-8 flex flex-wrap gap-2"
             >
               {trustPills.map((item) => (
                 <span
                   key={item}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/4 px-3 py-2 text-sm font-medium text-white/55"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-white/[0.40]"
                 >
-                  <BadgeCheck className="h-4 w-4 text-[#90a9ff]" />
+                  <BadgeCheck className="h-3.5 w-3.5 text-[hsl(221,83%,68%)]" />
                   {item}
                 </span>
               ))}
             </motion.div>
 
-            {/* Stats row */}
+            {/* Stats */}
             <motion.div
               variants={fadeUp}
-              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-12 grid gap-3 sm:grid-cols-3"
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-10 grid gap-3 sm:grid-cols-3"
             >
               {heroStats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-2xl border border-white/8 bg-white/[0.025] px-4 py-4 backdrop-blur-sm"
-                >
-                  <p className="font-mono-data text-2xl font-semibold text-white">{stat.value}</p>
-                  <p className="mt-1 text-sm text-white/45">{stat.label}</p>
+                <div key={stat.label} className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+                  <p className="font-mono-data text-xl font-semibold text-white">{stat.value}</p>
+                  <p className="mt-0.5 text-xs text-white/[0.35]">{stat.label}</p>
                 </div>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* Right: Dashboard preview card */}
+          {/* Right: Dashboard preview */}
           <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative mx-auto w-full max-w-[38rem]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="relative mx-auto w-full max-w-[36rem]"
           >
-            {/* Glow behind card */}
-            <div className="pointer-events-none absolute inset-x-8 top-16 h-72 rounded-full bg-[#4d7cff]/16 blur-3xl" />
-
-            <div
-              className="relative overflow-hidden rounded-[28px] p-4 sm:p-5"
-              style={{
-                background: "linear-gradient(180deg, rgba(18,22,34,0.95) 0%, rgba(9,12,20,0.95) 100%)",
-                border: "1px solid rgba(255,255,255,0.09)",
-                boxShadow: "0 32px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)",
-                backdropFilter: "blur(20px)",
-              }}
-            >
+            <div className="landing-surface-strong rounded-2xl p-4 sm:p-5">
               {/* Match header */}
-              <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-black/25 px-4 py-3">
+              <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-black/20 px-4 py-3">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/38">Today's board</p>
-                  <p className="mt-1 text-sm font-semibold text-white">MOUZ NXT vs CYBERSHOKE Esports</p>
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Today's board</p>
+                  <p className="mt-0.5 text-sm font-medium text-white">MOUZ NXT vs CYBERSHOKE</p>
                 </div>
-                <div className="flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+                <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   LIVE
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                {/* Main analysis card */}
-                <div
-                  className="rounded-[22px] p-5"
-                  style={{
-                    background: "rgba(255,255,255,0.025)",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                  }}
-                >
+              <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
+                {/* Main analysis */}
+                <div className="landing-surface rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/38">Primary read</p>
-                      <h3 className="mt-2 font-landing-display text-xl font-semibold text-white">
-                        Vitality moneyline
-                      </h3>
+                      <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Primary read</p>
+                      <h3 className="mt-1.5 font-landing-display text-lg text-white">Vitality ML</h3>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 text-right">
-                      <p className="text-[10px] font-medium text-white/38">Confidence</p>
-                      <p className="font-mono-data text-2xl font-semibold text-white">84%</p>
+                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-right">
+                      <p className="text-[10px] text-white/[0.30]">Confidence</p>
+                      <p className="font-mono-data text-xl font-semibold text-white">84%</p>
                     </div>
                   </div>
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div className="mt-4 grid gap-2 sm:grid-cols-3">
                     {[
-                      { icon: ShieldCheck, label: "Map pool", value: "Mirage / Nuke", sub: "Vitality stronger across the three-map spread." },
-                      { icon: LineChart, label: "Market edge", value: "+11.8% EV", sub: "Books lagging recent rating shift." },
-                      { icon: WalletCards, label: "Best line", value: "1.93 Pinnacle", sub: "Auto-compared across all books." },
-                    ].map(({ icon: Icon, label, value, sub }) => (
-                      <div
-                        key={label}
-                        className="rounded-2xl border border-white/8 bg-black/20 p-4"
-                      >
-                        <div className="flex items-center gap-2 text-white/40">
-                          <Icon className="h-4 w-4" />
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.18em]">{label}</span>
+                      { icon: ShieldCheck, label: "Map pool", value: "Mirage / Nuke" },
+                      { icon: LineChart, label: "Edge", value: "+11.8% EV" },
+                      { icon: WalletCards, label: "Best line", value: "1.93 Pinnacle" },
+                    ].map(({ icon: Icon, label, value }) => (
+                      <div key={label} className="rounded-lg border border-white/[0.06] bg-black/15 p-3">
+                        <div className="flex items-center gap-1.5 text-white/[0.30]">
+                          <Icon className="h-3.5 w-3.5" />
+                          <span className="text-[10px] font-medium uppercase tracking-wide">{label}</span>
                         </div>
-                        <p className="mt-4 text-sm font-semibold text-white">{value}</p>
-                        <p className="mt-1 text-xs text-white/45">{sub}</p>
+                        <p className="mt-2.5 text-[13px] font-medium text-white">{value}</p>
                       </div>
                     ))}
                   </div>
 
-                  {/* Progress bar */}
-                  <div className="mt-5 rounded-[18px] border border-white/8 bg-black/20 p-4">
-                    <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">
-                      <span>Model split</span>
-                      <span>Adjusted line</span>
+                  {/* Model split bar */}
+                  <div className="mt-4 rounded-lg border border-white/[0.06] bg-black/15 p-3">
+                    <div className="mb-2 flex items-center justify-between text-[11px] font-medium text-white/[0.40]">
+                      <span>Vitality 56%</span>
+                      <span>MOUZ NXT 44%</span>
                     </div>
-                    <div className="mt-4">
-                      <div className="mb-2 flex items-center justify-between text-sm font-semibold text-white/68">
-                        <span>Vitality 56%</span>
-                        <span>MOUZ NXT 44%</span>
-                      </div>
-                      <div className="flex h-2.5 overflow-hidden rounded-full bg-white/8">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: "56%" }}
-                          transition={{ duration: 1.2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                          className="h-full bg-gradient-to-r from-[#6b8cff] to-[#4d7cff]"
-                        />
-                        <div className="h-full flex-1 bg-white/18" />
-                      </div>
+                    <div className="flex h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: "56%" }}
+                        transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="h-full rounded-full bg-[hsl(221,83%,58%)]"
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Right column */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Odds compare */}
-                  <div
-                    className="rounded-[22px] p-4"
-                    style={{
-                      background: "rgba(255,255,255,0.025)",
-                      border: "1px solid rgba(255,255,255,0.07)",
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/38">Odds compare</p>
-                        <p className="mt-1.5 text-sm font-semibold text-white">Best available line</p>
-                      </div>
-                      <span className="rounded-full border border-[#4d7cff]/20 bg-[#4d7cff]/10 px-2.5 py-1 text-[10px] font-semibold text-[#9fb7ff]">
-                        Match Win
-                      </span>
-                    </div>
-                    <div className="mt-4 space-y-2.5">
+                  <div className="landing-surface rounded-xl p-3.5">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Odds compare</p>
+                    <div className="mt-3 space-y-2">
                       {[
-                        { book: "Pinnacle", t1: "1.93", t2: "1.81", best: true },
-                        { book: "GG.BET", t1: "1.91", t2: "1.79", best: false },
-                        { book: "Thunderpick", t1: "1.88", t2: "1.84", best: false },
+                        { book: "Pinnacle", t1: "1.93", best: true },
+                        { book: "GG.BET", t1: "1.91", best: false },
+                        { book: "Thunderpick", t1: "1.88", best: false },
                       ].map((row) => (
                         <div
                           key={row.book}
-                          className={`rounded-xl border px-3 py-2.5 ${
+                          className={`flex items-center justify-between rounded-lg px-3 py-2 ${
                             row.best
-                              ? "border-[#4d7cff]/25 bg-[#4d7cff]/10"
-                              : "border-white/7 bg-white/[0.025]"
+                              ? "border border-[hsl(221,83%,58%)]/20 bg-[hsl(221,83%,58%)]/[0.06]"
+                              : "border border-white/[0.04] bg-white/[0.02]"
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-white">{row.book}</span>
-                            {row.best && (
-                              <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#9fb7ff]">
-                                Best
-                              </span>
-                            )}
-                          </div>
-                          <div className="mt-2 grid grid-cols-2 gap-1.5 text-center">
-                            <div className="rounded-lg bg-black/18 px-2 py-1.5">
-                              <p className="text-[9px] uppercase tracking-[0.2em] text-white/32">Vitality</p>
-                              <p className="mt-0.5 font-mono-data text-sm font-semibold text-white">{row.t1}</p>
-                            </div>
-                            <div className="rounded-lg bg-black/18 px-2 py-1.5">
-                              <p className="text-[9px] uppercase tracking-[0.2em] text-white/32">MOUZ</p>
-                              <p className="mt-0.5 font-mono-data text-sm font-semibold text-white">{row.t2}</p>
-                            </div>
-                          </div>
+                          <span className="text-xs font-medium text-white/[0.65]">{row.book}</span>
+                          <span className="font-mono-data text-sm font-semibold text-white">{row.t1}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Player prop spotlight */}
-                  <div
-                    className="rounded-[22px] p-4"
-                    style={{
-                      background: "rgba(255,255,255,0.025)",
-                      border: "1px solid rgba(255,255,255,0.07)",
-                    }}
-                  >
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/38">Player spotlight</p>
+                  {/* Player spotlight */}
+                  <div className="landing-surface rounded-xl p-3.5">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Player spotlight</p>
                     <div className="mt-3 flex items-center gap-3">
-                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-[#4d7cff]/20 to-[#6b8cff]/10 text-sm font-bold text-white">
+                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.03] text-xs font-bold text-white">
                         Zy
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-white">ZywOo over 19.5</p>
-                          <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-[13px] font-medium text-white">ZywOo over 19.5</p>
+                          <TrendingUp className="h-3 w-3 text-emerald-400" />
                         </div>
-                        <p className="mt-1 text-xs leading-5 text-white/48">
-                          Role matchup, KPR trend, favorable map trio.
-                        </p>
+                        <p className="mt-0.5 text-[11px] text-white/[0.35]">Role matchup, KPR trend, favorable maps.</p>
                       </div>
                     </div>
                   </div>
