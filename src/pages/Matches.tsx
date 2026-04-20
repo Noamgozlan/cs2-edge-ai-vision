@@ -9,11 +9,11 @@ import { TeamLogo } from "@/lib/team-logos";
 import { useState } from "react";
 
 const filters = [
-  { label: "All Matches", icon: "🟢", active: true },
-  { label: "Live Now", icon: "🔴" },
-  { label: "Majors", icon: "🏆" },
-  { label: "Tier 1", icon: "💎" },
-  { label: "Favorites", icon: "❤️" },
+  { label: "All Matches", icon: "All", active: true },
+  { label: "Live Now", icon: "Live" },
+  { label: "Majors", icon: "Maj" },
+  { label: "Tier 1", icon: "T1" },
+  { label: "Favorites", icon: "Fav" },
 ];
 
 function matchLink(m: Match) {
@@ -36,7 +36,6 @@ const Matches = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-black tracking-tight">Upcoming Matches</h1>
         <span className="text-[10px] font-black uppercase tracking-widest bg-accent/20 text-accent px-2.5 py-1 rounded-full">
@@ -44,7 +43,6 @@ const Matches = () => {
         </span>
       </div>
 
-      {/* Filter Chips */}
       <div className="flex items-center gap-2 flex-wrap">
         {filters.map((f, i) => (
           <button
@@ -76,13 +74,11 @@ const Matches = () => {
 
       {featured && (
         <>
-          {/* Section Label */}
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Grand Final Feature</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          {/* Featured Match */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,7 +130,6 @@ const Matches = () => {
 
       {matches && matches.length > 0 && (
         <>
-          {/* Section Label */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">All Scheduled Matches</span>
@@ -145,7 +140,6 @@ const Matches = () => {
             </span>
           </div>
 
-          {/* Match List */}
           <div className="space-y-3">
             {matches.slice(1).map((m, i) => (
               <motion.div
@@ -158,7 +152,6 @@ const Matches = () => {
                   to={matchLink(m)}
                   className="group flex items-center gap-4 rounded-xl bg-card border border-border p-4 hover:border-primary/40 transition-all"
                 >
-                  {/* Time */}
                   <div className="w-16 shrink-0 text-center">
                     <p className="text-lg font-black">{convertTime(m.time).split(" ")[0]}</p>
                     <p className="text-[9px] font-bold uppercase text-muted-foreground tracking-widest">Today</p>
@@ -166,7 +159,6 @@ const Matches = () => {
 
                   <div className="h-10 w-px bg-border shrink-0" />
 
-                  {/* Teams */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <span className="font-bold text-sm truncate">{m.team1}</span>
                     <TeamLogo name={m.team1} size={32} />
@@ -175,7 +167,6 @@ const Matches = () => {
                     <span className="font-bold text-sm truncate">{m.team2}</span>
                   </div>
 
-                  {/* Event & Format */}
                   <div className="hidden lg:flex flex-col items-center gap-0.5 w-44 shrink-0">
                     <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Tournament</span>
                     <span className="text-xs font-semibold text-center truncate w-full">{m.event}</span>
@@ -186,7 +177,6 @@ const Matches = () => {
                     <span className="text-xs font-black">{m.format}</span>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={(e) => e.preventDefault()}

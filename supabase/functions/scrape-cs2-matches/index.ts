@@ -32,7 +32,9 @@ serve(async (req) => {
   try {
     const FIRECRAWL_KEY = Deno.env.get("FIRECRAWL_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const SUPABASE_SERVICE_KEY =
+      Deno.env.get("SUPABASE_SECRET_KEY") ??
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
     if (!FIRECRAWL_KEY) {
       logError("FIRECRAWL_API_KEY not configured");

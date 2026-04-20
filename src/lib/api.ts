@@ -35,6 +35,7 @@ export interface PlayerStat {
   kpr: string;
   dpr: string;
   impact: string;
+  playerPhoto?: PlayerPhoto;
 }
 
 export interface AlternativeBet {
@@ -42,6 +43,7 @@ export interface AlternativeBet {
   betType: string;
   confidence: number;
   reasoning: string;
+  playerContext?: PlayerPredictionContext;
 }
 
 export interface MapBreakdownData {
@@ -66,6 +68,34 @@ export interface PlayerFormData {
   avgKills: number;
   clutchRate: string;
   openingDuelWinRate: string;
+  playerPhoto?: PlayerPhoto;
+}
+
+export interface PlayerPhoto {
+  playerName: string;
+  imageUrl: string;
+  profileUrl?: string;
+  source: "hltv" | "fallback";
+  cacheKey: string;
+  found: boolean;
+}
+
+export interface PlayerPredictionContext {
+  playerName?: string;
+  team?: string;
+  playerPhoto?: PlayerPhoto | null;
+  isPlayerMarket: boolean;
+}
+
+export interface PlayerSpotlight {
+  name: string;
+  team: string;
+  market: string;
+  imageUrl: string;
+  profileUrl?: string;
+  playerPhoto: PlayerPhoto;
+  source: "hltv" | "fallback";
+  found: boolean;
 }
 
 export interface MatchAnalysis {
@@ -75,6 +105,7 @@ export interface MatchAnalysis {
     confidence: number;
     winProbability: { team1: number; team2: number };
     expectedValue?: string;
+    playerContext?: PlayerPredictionContext;
   };
   alternativeBets?: AlternativeBet[];
   veto: VetoStep[];
@@ -89,7 +120,30 @@ export interface MatchAnalysis {
     team2: Record<string, string>;
   };
   playerStats: PlayerStat[];
+  playerSpotlights?: PlayerSpotlight[];
+  playerPhotoDirectory?: Record<string, PlayerPhoto>;
   dataSource?: "live" | "training";
+}
+
+export interface BettingCompareRow {
+  sportsbook: string;
+  market: string;
+  team1Odds?: number | null;
+  team2Odds?: number | null;
+  drawOdds?: number | null;
+  bookmakerUrl?: string | null;
+}
+
+export interface BettingCompareMarket {
+  name: string;
+  rows: BettingCompareRow[];
+}
+
+export interface BettingCompareResponse {
+  matchUrl?: string | null;
+  markets: BettingCompareMarket[];
+  lastUpdated: string;
+  source: "hltv" | "fallback";
 }
 
 export async function fetchMatches(): Promise<Match[]> {
@@ -183,7 +237,7 @@ function generateClientFallbackAnalysis(
         {
           title: "Fallback Analysis",
           emoji: "⚠️",
-          content: "Live AI credits are unavailable right now, so this prediction uses fallback training logic.",
+          content: "Live AI analysis is temporarily unavailable, so this prediction uses fallback training logic.",
         },
       ],
     },
@@ -206,26 +260,56 @@ export async function fetchAIAnalysis(
   format?: string,
   language?: string
 ): Promise<MatchAnalysis> {
-  const { data, error } = await supabase.functions.invoke("ai-analysis", {
-    body: { team1, team2, event, format, language: language || "en" },
+  try {
+    const { data, error } = await supabase.functions.invoke("ai-analysis", {
+      body: {
+        team1,
+        team2,
+        event,
+        format,
+        language,
+      },
+    });
+
+    if (error) {
+      console.error("Error fetching AI analysis:", error);
+      return generateClientFallbackAnalysis(team1, team2, event, format);
+    }
+
+    if (!data) {
+      console.error("AI analysis function returned no data");
+      return generateClientFallbackAnalysis(team1, team2, event, format);
+    }
+
+    return data as MatchAnalysis;
+  } catch (error) {
+    console.error("Failed to invoke ai-analysis:", error);
+    return generateClientFallbackAnalysis(team1, team2, event, format);
+  }
+}
+
+export async function fetchBettingCompare(
+  team1: string,
+  team2: string,
+  event?: string,
+): Promise<BettingCompareResponse> {
+  const { data, error } = await supabase.functions.invoke("hltv-odds", {
+    body: {
+      team1,
+      team2,
+      event,
+    },
   });
 
   if (error) {
-    const status = (error as any)?.context?.status ?? (error as any)?.status;
-    if (status === 402 || status === 429) {
-      return generateClientFallbackAnalysis(team1, team2, event, format);
-    }
-    console.error("Error fetching AI analysis:", error);
+    console.error("Error fetching betting comparison:", error);
     throw error;
   }
 
-  if (data?.error) {
-    const message = String(data.error);
-    if (message.includes("Credits needed") || message.includes("rate limit")) {
-      return generateClientFallbackAnalysis(team1, team2, event, format);
-    }
-    throw new Error(message);
-  }
-
-  return data;
+  return (data || {
+    matchUrl: null,
+    markets: [],
+    lastUpdated: new Date().toISOString(),
+    source: "fallback",
+  }) as BettingCompareResponse;
 }

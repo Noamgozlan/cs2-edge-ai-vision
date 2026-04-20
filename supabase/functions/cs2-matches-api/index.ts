@@ -15,8 +15,10 @@ serve(async (req) => {
     const tz = url.searchParams.get("tz") || "UTC";
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_PUBLISHABLE_KEY =
+      Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ??
+      Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     // Route: /today
     if (pathname === "/today" || pathname === "/" || pathname === "") {

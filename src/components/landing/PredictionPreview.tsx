@@ -1,153 +1,158 @@
 import { motion } from "framer-motion";
-import { TeamLogo } from "@/lib/team-logos";
-import { Zap, TrendingUp, Shield, Database } from "lucide-react";
+import { ArrowUpRight, Boxes, NotebookTabs, SearchCheck, Zap } from "lucide-react";
 
-const PredictionPreview = () => (
-  <section id="predictions" className="py-28 bg-card/50 overflow-hidden relative">
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(var(--primary)/0.04)_0%,_transparent_60%)] pointer-events-none" />
+const steps = [
+  {
+    number: "01",
+    icon: SearchCheck,
+    title: "Open a live match",
+    body: "Start from today’s board and jump into any series with team context, status, and current market pricing already prepared.",
+  },
+  {
+    number: "02",
+    icon: NotebookTabs,
+    title: "Compare the edge",
+    body: "Check AI analysis, predicted veto flow, player form, and bookmaker pricing side by side instead of opening five different tools.",
+  },
+  {
+    number: "03",
+    icon: Boxes,
+    title: "Move with confidence",
+    body: "Take the best line, save the bet, and keep the rationale attached so your workflow stays disciplined over time.",
+  },
+];
 
-    <div className="max-w-screen-xl mx-auto px-6 lg:px-12">
-      {/* Header */}
-      <div className="text-center mb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <span className="inline-block text-[11px] font-bold text-accent uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full border border-accent/20 bg-accent/5">
-            Live Preview
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            See the AI in <span className="text-primary">Action</span>
-          </h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Real analysis output from our neural engine — updated in real-time with live HLTV data.
-          </p>
-        </motion.div>
-      </div>
+const PredictionPreview = () => {
+  return (
+    <section id="workflow" className="relative border-t border-white/7 py-24 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="landing-section-label text-xs font-semibold uppercase">As Simple As It Gets</p>
+              <h2 className="font-landing-display mt-4 text-4xl font-semibold text-white sm:text-5xl">
+                Start your edge in a few clean steps.
+              </h2>
+              <p className="mt-5 max-w-[56ch] text-base leading-8 text-white/60">
+                This section borrows the strongest part of the reference flow: clear onboarding structure with polished depth,
+                without turning your product into a generic clone.
+              </p>
+            </motion.div>
 
-      {/* Preview card */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="max-w-4xl mx-auto"
-      >
-        <div className="rounded-2xl border border-border bg-card shadow-xl overflow-hidden">
-          {/* Top bar */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                <div className="w-3 h-3 rounded-full bg-accent/40" />
-                <div className="w-3 h-3 rounded-full bg-primary/40" />
-              </div>
-              <span className="text-[11px] font-bold text-muted-foreground">CS2 Edge AI — Match Analysis</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Database className="w-3.5 h-3.5 text-accent" />
-              <span className="text-[10px] font-bold text-accent">LIVE DATA</span>
+            <div className="mt-10 space-y-4">
+              {steps.map((step, index) => (
+                <motion.article
+                  key={step.number}
+                  initial={{ opacity: 0, x: -18 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.45, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                  className="landing-surface rounded-[24px] p-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/6">
+                      <step.icon className="h-5 w-5 text-[#a7bbff]" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono-data text-sm font-semibold text-white/40">{step.number}</span>
+                        <h3 className="text-lg font-semibold text-white">{step.title}</h3>
+                      </div>
+                      <p className="mt-3 text-sm leading-7 text-white/58">{step.body}</p>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
             </div>
           </div>
 
-          <div className="p-6 md:p-10">
-            {/* Match header */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <TeamLogo name="G2 Esports" size={44} />
-                <div>
-                  <p className="font-bold text-lg">G2 Esports</p>
-                  <p className="text-xs text-muted-foreground">World #3</p>
-                </div>
+          <motion.div
+            id="predictions"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="landing-surface-strong rounded-[30px] p-5 sm:p-6"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-white/7 bg-black/16 px-4 py-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/38">Live preview</p>
+                <p className="mt-1 text-lg font-semibold text-white">A landing experience that now feels product-grade</p>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-black text-muted-foreground/30">VS</p>
-                <p className="text-[10px] text-muted-foreground mt-1">IEM Katowice • Bo3</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="font-bold text-lg">FaZe Clan</p>
-                  <p className="text-xs text-muted-foreground">World #4</p>
-                </div>
-                <TeamLogo name="FaZe Clan" size={44} />
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-sm font-medium text-white/72">
+                <Zap className="h-4 w-4 text-[#9fb7ff]" />
+                Refined motion and hierarchy
               </div>
             </div>
 
-            {/* Smart bet card */}
-            <div className="rounded-xl p-5 mb-6" style={{
-              background: "linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--accent) / 0.05) 100%)",
-              border: "1px solid hsl(var(--primary) / 0.2)",
-            }}>
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">AI Smart Bet — Both Win Map</span>
-              </div>
-              <p className="text-xl font-black mb-3">Both Teams to Win a Map (Yes) @ 1.88</p>
-              <div className="flex items-center gap-6">
-                <span className="text-sm font-bold text-primary">84% confidence</span>
-                <span className="text-sm font-bold text-accent">EV: +16.2%</span>
-              </div>
-            </div>
+            <div className="mt-5 grid gap-4 xl:grid-cols-[1fr_0.9fr]">
+              <div className="landing-surface rounded-[24px] p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/38">Match board</p>
+                    <p className="mt-1 text-sm font-semibold text-white">Monday slate · 12 live and upcoming spots</p>
+                  </div>
+                  <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-[11px] font-semibold text-white/64">
+                    Updated 2m ago
+                  </span>
+                </div>
 
-            {/* Probability + Veto side by side */}
-            <div className="grid md:grid-cols-2 gap-5">
-              {/* Win probability */}
-              <div className="rounded-xl border border-border p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-bold">Win Probability</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold mb-2">
-                  <span>G2 — 52%</span>
-                  <span className="text-primary">FaZe — 48%</span>
-                </div>
-                <div className="w-full h-3 rounded-full bg-muted overflow-hidden flex">
-                  <motion.div
-                    className="h-full bg-primary rounded-l-full"
-                    initial={{ width: 0 }}
-                    whileInView={{ width: "52%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                  />
-                  <motion.div
-                    className="h-full bg-muted-foreground/30 rounded-r-full"
-                    initial={{ width: 0 }}
-                    whileInView={{ width: "48%" }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.1 }}
-                  />
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-3">
-                  m0NESY predicted 39+ kills — top fragger prop @ 1.83
-                </p>
-              </div>
-
-              {/* Veto preview */}
-              <div className="rounded-xl border border-border p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Shield className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-bold">Predicted Veto</span>
-                </div>
-                <div className="space-y-2">
+                <div className="mt-4 space-y-3">
                   {[
-                    { action: "ban", team: "G2", map: "Vertigo", color: "text-destructive bg-destructive/8 border-destructive/15" },
-                    { action: "ban", team: "FaZe", map: "Anubis", color: "text-destructive bg-destructive/8 border-destructive/15" },
-                    { action: "pick", team: "G2", map: "Inferno", color: "text-accent bg-accent/8 border-accent/15" },
-                    { action: "pick", team: "FaZe", map: "Nuke", color: "text-accent bg-accent/8 border-accent/15" },
-                  ].map((v, i) => (
-                    <div key={i} className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs border ${v.color}`}>
-                      <span className="font-bold uppercase tracking-wider">{v.team} {v.action}</span>
-                      <span className="font-bold">{v.map}</span>
+                    { match: "Vitality vs Spirit", lean: "Vitality ML", confidence: "82%" },
+                    { match: "FaZe vs G2", lean: "Over 2.5 Maps", confidence: "76%" },
+                    { match: "MOUZ NXT vs CYBERSHOKE", lean: "Best odds compare", confidence: "68%" },
+                  ].map((row, index) => (
+                    <div
+                      key={row.match}
+                      className={`flex items-center justify-between rounded-2xl border px-4 py-4 ${
+                        index === 0 ? "border-[#4d7cff]/20 bg-[#4d7cff]/10" : "border-white/7 bg-white/[0.03]"
+                      }`}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-white">{row.match}</p>
+                        <p className="mt-1 text-xs text-white/48">{row.lean}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono-data text-xl font-semibold text-white">{row.confidence}</p>
+                        <p className="text-[10px] uppercase tracking-[0.22em] text-white/36">confidence</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              <div className="space-y-4">
+                <div className="landing-surface rounded-[24px] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/38">Reasoning panel</p>
+                  <p className="mt-3 text-lg font-semibold text-white">Every recommendation ships with the “why”.</p>
+                  <p className="mt-3 text-sm leading-7 text-white/56">
+                    The new landing preview leans into argument quality, bookmaker context, and map-level explanation so the product feels serious before login.
+                  </p>
+                </div>
+
+                <div className="landing-surface rounded-[24px] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/38">Action layer</p>
+                  <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/7 bg-white/[0.03] px-4 py-4">
+                    <div>
+                      <p className="text-sm font-semibold text-white">Open the full dashboard</p>
+                      <p className="mt-1 text-xs text-white/48">See predictions, odds compare, and prop depth.</p>
+                    </div>
+                    <ArrowUpRight className="h-5 w-5 text-[#a7bbff]" />
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </motion.div>
-    </div>
-  </section>
-);
+      </div>
+    </section>
+  );
+};
 
 export default PredictionPreview;

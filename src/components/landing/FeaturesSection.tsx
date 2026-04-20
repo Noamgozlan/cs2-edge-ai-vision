@@ -1,107 +1,174 @@
 import { motion } from "framer-motion";
-import { Brain, Map, TrendingUp, Timer, BarChart3, Crosshair } from "lucide-react";
+import {
+  BrainCircuit,
+  Radar,
+  ScanSearch,
+  Swords,
+  Trophy,
+  BellRing,
+  ArrowUpRight,
+} from "lucide-react";
 
-const features = [
+const featureCards = [
   {
-    icon: Brain,
-    title: "AI Match Predictions",
-    desc: "Deep learning models trained on 10+ years of pro match data deliver probability-weighted predictions across all bet types.",
-    stat: "73.2%",
-    statLabel: "Accuracy",
+    icon: BrainCircuit,
+    eyebrow: "Unlike any workflow you've used before",
+    title: "A premium betting workspace, not another noisy pick feed.",
+    description:
+      "Map logic, player context, line shopping, and confidence framing all land in one composed view so the sharpest angle is obvious fast.",
+    list: ["Model-weighted market ranking", "Live source freshness status", "Clean sportsbook comparison"],
+    span: "lg:col-span-2",
+    accent: "#4d7cff",
   },
   {
-    icon: Map,
-    title: "Map Veto Simulation",
-    desc: "Predict ban/pick sequences with map-specific win rate analysis and team preference modeling.",
-    stat: "92%",
-    statLabel: "Veto Accuracy",
+    icon: Radar,
+    eyebrow: "Signal first",
+    title: "Live data that stays current enough to matter.",
+    description:
+      "PandaScore and HLTV-backed inputs refresh your view before price drift and public sentiment flatten the edge.",
+    list: ["Fresh match sync", "Rosters and form", "Book odds updates"],
+    span: "",
+    accent: "#2bd0b0",
   },
   {
-    icon: TrendingUp,
-    title: "Smart Bet Discovery",
-    desc: "Beyond match winner — the AI evaluates player props, handicaps, round totals, and more to find the highest-EV play.",
-    stat: "+14%",
-    statLabel: "Avg. EV",
+    icon: ScanSearch,
+    eyebrow: "Player market depth",
+    title: "Player props with context, not just numbers.",
+    description:
+      "Recent form, likely maps, role fit, and market-specific framing make the prop board feel curated instead of raw.",
+    list: ["Kill line reads", "Opening duel context", "Photo-led spotlight"],
+    span: "",
+    accent: "#9b8cff",
   },
   {
-    icon: Timer,
-    title: "Real-Time HLTV Data",
-    desc: "Live-scraped stats from HLTV ensure every prediction uses the latest player form, roster changes, and results.",
-    stat: "< 5min",
-    statLabel: "Data Freshness",
+    icon: Swords,
+    eyebrow: "Map veto engine",
+    title: "Veto sequencing that explains why the number moved.",
+    description:
+      "Ban and pick forecasts expose where matchup pressure builds before a series starts.",
+    list: ["Predicted bans and picks", "Map-by-map edge notes", "Series-path clarity"],
+    span: "",
+    accent: "#ff8c6b",
   },
   {
-    icon: BarChart3,
-    title: "Odds Comparison",
-    desc: "Aggregated lines across major bookmakers so you always know where the best value sits before placing.",
-    stat: "6+",
-    statLabel: "Bookmakers",
+    icon: Trophy,
+    eyebrow: "Decision-ready analysis",
+    title: "Recommendations framed like a trading terminal.",
+    description:
+      "Every bet is shown with confidence, expected value, likely scenarios, and what could break the read.",
+    list: ["Primary and secondary angles", "Probability framing", "Risk-aware rationale"],
+    span: "",
+    accent: "#f0c040",
   },
   {
-    icon: Crosshair,
-    title: "Player Prop Insights",
-    desc: "Kill lines, impact ratings, and opening duel stats power per-player betting recommendations with precision.",
-    stat: "50+",
-    statLabel: "Stats Per Player",
+    icon: BellRing,
+    eyebrow: "Built for action",
+    title: "From first look to final ticket in a few disciplined steps.",
+    description:
+      "The product stays dense where it matters and quiet where it should — expensive and easy at the same time.",
+    list: ["Clean empty and loading states", "Responsive on every screen", "Fast interaction feedback"],
+    span: "lg:col-span-2",
+    accent: "#4d7cff",
   },
 ];
 
-const FeaturesSection = () => (
-  <section id="features" className="py-28 bg-background relative overflow-hidden">
-    {/* Subtle background accent */}
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
+const FeaturesSection = () => {
+  return (
+    <section id="features" className="relative border-t border-white/6 py-24 sm:py-28">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-64 w-[600px] rounded-full bg-[#4d7cff]/6 blur-3xl" />
 
-    <div className="max-w-screen-xl mx-auto px-6 lg:px-12 relative">
-      {/* Header */}
-      <div className="text-center mb-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-120px" }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="mx-auto mb-14 max-w-3xl text-center"
         >
-          <span className="inline-block text-[11px] font-bold text-primary uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5">
-            Features
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Built for{" "}
-            <span className="text-primary">Serious</span> Bettors
+          <p className="landing-section-label text-xs font-semibold uppercase">Why It Feels Different</p>
+          <h2
+            className="font-landing-display mt-4 text-4xl font-semibold sm:text-5xl"
+            style={{
+              background: "linear-gradient(135deg, #ffffff 40%, #9fb7ff 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Premium infrastructure for people who care where the number comes from.
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            Every tool you need to find value, validate your reads, and make smarter CS2 bets — powered by real data and neural networks.
+          <p className="mx-auto mt-5 max-w-[60ch] text-base leading-8 text-white/52">
+            Cleaner hierarchy, stronger authority, and a faster path from information to conviction.
           </p>
         </motion.div>
+
+        {/* Bento grid */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          {featureCards.map((card, index) => (
+            <motion.article
+              key={card.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -4, scale: 1.005 }}
+              className={`group relative overflow-hidden rounded-[22px] p-6 sm:p-7 ${card.span} cursor-default`}
+              style={{
+                background: "linear-gradient(180deg, rgba(16,20,30,0.9) 0%, rgba(9,12,18,0.9) 100%)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
+                backdropFilter: "blur(16px)",
+              }}
+            >
+              {/* Hover glow */}
+              <div
+                className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
+                style={{ background: card.accent + "18" }}
+              />
+
+              {/* Icon */}
+              <div
+                className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10"
+                style={{ background: card.accent + "15" }}
+              >
+                <card.icon className="h-5 w-5" style={{ color: card.accent }} />
+              </div>
+
+              <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/35">
+                {card.eyebrow}
+              </p>
+              <h3 className="mt-3 font-landing-display text-xl font-semibold text-white leading-tight">
+                {card.title}
+              </h3>
+              <p className="mt-4 text-sm leading-7 text-white/52">{card.description}</p>
+
+              <ul className="mt-6 space-y-2">
+                {card.list.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-2.5 rounded-xl border border-white/7 bg-black/18 px-4 py-2.5 text-sm font-medium text-white/62"
+                  >
+                    <span
+                      className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                      style={{ background: card.accent }}
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Hover arrow link hint */}
+              <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ color: card.accent }}>
+                Learn more <ArrowUpRight className="h-3.5 w-3.5" />
+              </div>
+            </motion.article>
+          ))}
+        </div>
       </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {features.map((f, i) => (
-          <motion.div
-            key={f.title}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.06 }}
-            className="group relative rounded-2xl border border-border bg-card p-7 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-          >
-            {/* Icon */}
-            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-colors">
-              <f.icon className="w-5 h-5 text-primary" />
-            </div>
-
-            {/* Content */}
-            <h4 className="text-base font-bold mb-2">{f.title}</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-5">{f.desc}</p>
-
-            {/* Stat pill */}
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-black text-primary">{f.stat}</span>
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{f.statLabel}</span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default FeaturesSection;

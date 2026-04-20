@@ -20,7 +20,6 @@ const Predictions = () => {
     refetchInterval: 3 * 60 * 1000,
   });
 
-  // Fetch AI predictions for each match
   const { data: predictions, isLoading: predictionsLoading } = useQuery({
     queryKey: ["predictions-batch", matches?.map(m => `${m.team1}-${m.team2}`), language],
     queryFn: async () => {
@@ -135,7 +134,7 @@ const Predictions = () => {
                 onClick={openCheckout}
                 className="px-4 py-2 rounded-lg text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
               >
-                Upgrade to Pro — $19.99/mo
+                Upgrade to Pro - $19.99/mo
               </button>
             </div>
           )}

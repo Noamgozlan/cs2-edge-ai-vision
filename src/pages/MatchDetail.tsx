@@ -1,10 +1,23 @@
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAIAnalysis, type MatchAnalysis, type AlternativeBet } from "@/lib/api";
+import { BettingCompareResponse, fetchAIAnalysis, fetchBettingCompare, MatchAnalysis } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  ArrowLeft, Loader2, Zap, TrendingUp, Shield, Swords,
-  Users, History, Lock, BookmarkPlus, Database
+  ArrowLeft,
+  Loader2,
+  Zap,
+  TrendingUp,
+  Shield,
+  Swords,
+  Users,
+  History,
+  BookmarkPlus,
+  Activity,
+  BarChart3,
+  Clock3,
+  Target,
+  Scale,
+  ExternalLink,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { TeamLogo } from "@/lib/team-logos";
@@ -15,18 +28,25 @@ import PlayerFormHeatmap from "@/components/dashboard/PlayerFormHeatmap";
 import PreMatchCountdown from "@/components/dashboard/PreMatchCountdown";
 import { toast } from "sonner";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
 } from "recharts";
 
-const TABS = ["Analysis", "Stats", "Veto", "Rosters", "History"] as const;
+const TABS = ["Analysis", "Stats", "Veto", "Rosters", "History", "Betting Compare"] as const;
 type Tab = typeof TABS[number];
 
 const MatchDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>("Analysis");
+  const [isAnalysisRequested, setIsAnalysisRequested] = useState(false);
 
   const team1 = searchParams.get("team1") || "Team A";
   const team2 = searchParams.get("team2") || "Team B";
@@ -35,15 +55,29 @@ const MatchDetail = () => {
   const time = searchParams.get("time") || "";
   const rank1 = searchParams.get("rank1") || "";
   const rank2 = searchParams.get("rank2") || "";
+  const score1 = searchParams.get("score1");
+  const score2 = searchParams.get("score2");
+  const status = searchParams.get("status") || "upcoming";
+
+  const shouldLoadAnalysis = isAnalysisRequested || activeTab !== "Analysis";
+  const shouldLoadBettingCompare = activeTab === "Betting Compare";
 
   const { data: analysis, isLoading, error } = useQuery({
     queryKey: ["ai-analysis", team1, team2, event, format, language],
     queryFn: () => fetchAIAnalysis(team1, team2, event, format, language),
     staleTime: 10 * 60 * 1000,
     retry: 1,
+    enabled: shouldLoadAnalysis,
   });
 
-  // Probability trajectory chart data
+  const { data: bettingCompare, isLoading: isOddsLoading } = useQuery({
+    queryKey: ["betting-compare", team1, team2, event],
+    queryFn: () => fetchBettingCompare(team1, team2, event),
+    staleTime: 2 * 60 * 1000,
+    retry: 1,
+    enabled: shouldLoadBettingCompare,
+  });
+
   const trajectoryData = useMemo(() => {
     if (!analysis) return [];
     const p1 = analysis.prediction.winProbability.team1;
@@ -57,62 +91,81 @@ const MatchDetail = () => {
     ];
   }, [analysis]);
 
+  const containerVars = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
+  const itemVars = {
+    hidden: { opacity: 0, y: 12 },
+    show: { opacity: 1, y: 0, transition: { ease: [0.16, 1, 0.3, 1], duration: 0.5 } },
+  };
+
+  const matchStatusLabel =
+    status === "live" ? "Live Match" : status === "finished" ? "Finished Match" : "Upcoming Match";
+  const hasScore = score1 !== null && score1 !== "" && score2 !== null && score2 !== "";
+
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <Link
         to="/dashboard/matches"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> {t("match.back")}
+        <ArrowLeft className="w-4 h-4" /> Back to matches
       </Link>
 
-      {/* Match Header */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded text-[10px] font-black bg-primary/15 text-primary border border-primary/20 uppercase tracking-wider">
-              Live Analysis
-            </span>
-            <span className="text-sm text-muted-foreground">{event}</span>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{matchStatusLabel}</span>
+            <span className="text-xs font-medium text-muted-foreground/60 px-1">•</span>
+            <span className="text-xs font-medium text-muted-foreground">{event}</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight flex items-center gap-3">
-            <TeamLogo name={team1} size={36} />
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight flex items-center gap-3">
+            <TeamLogo name={team1} size={40} />
             {team1}
-            <span className="text-muted-foreground font-medium text-2xl">vs</span>
-            <TeamLogo name={team2} size={36} />
+            <span className="text-muted-foreground/40 font-medium text-xl px-2">vs</span>
+            <TeamLogo name={team2} size={40} />
             {team2}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Advanced AI Performance Forecasting & Veto Modeling
-          </p>
         </div>
         {rank1 && rank2 && (
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-center">
-              <p className="text-[9px] font-bold text-primary uppercase tracking-widest">
-                {team1.length > 8 ? team1.substring(0, 6).toUpperCase() : team1.toUpperCase()} Rank
-              </p>
-              <p className="text-2xl font-black text-primary">#{rank1}</p>
+          <div className="flex items-center gap-2">
+            <div className="surface-raised rounded-lg px-4 py-2.5 text-center min-w-[80px]">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">{team1} Rank</p>
+              <p className="text-lg font-bold font-mono-data">#{rank1}</p>
             </div>
-            <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-center">
-              <p className="text-[9px] font-bold text-primary uppercase tracking-widest">
-                {team2.length > 8 ? team2.substring(0, 6).toUpperCase() : team2.toUpperCase()} Rank
-              </p>
-              <p className="text-2xl font-black text-primary">#{rank2}</p>
+            <div className="surface-raised rounded-lg px-4 py-2.5 text-center min-w-[80px]">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">{team2} Rank</p>
+              <p className="text-lg font-bold font-mono-data">#{rank2}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-border overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+      {hasScore && (
+        <div className="surface-raised rounded-xl p-4 flex items-center justify-center gap-8">
+          <ScoreBlock team={team1} score={score1 || "0"} />
+          <div className="text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Score</p>
+            <p className="text-sm text-muted-foreground">{format}</p>
+          </div>
+          <ScoreBlock team={team2} score={score2 || "0"} />
+        </div>
+      )}
+
+      <div className="flex items-center gap-6 border-b border-border/60 overflow-x-auto scrollbar-hide">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
+            className={`pb-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               activeTab === tab
-                ? "border-primary text-primary"
+                ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -121,341 +174,300 @@ const MatchDetail = () => {
         ))}
       </div>
 
-      {/* Loading */}
       {isLoading && (
-        <div className="p-16 flex flex-col items-center gap-4">
-          <div className="relative">
-            <Loader2 className="w-10 h-10 animate-spin text-primary" />
-            <Zap className="w-4 h-4 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-          </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="p-16 flex flex-col items-center justify-center gap-4 bg-card/30 rounded-xl border border-border/50"
+        >
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/50" />
           <div className="text-center">
-            <p className="font-semibold">AI is analyzing this matchup...</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Evaluating player stats, map pools, recent form & historical data
-            </p>
+            <p className="font-semibold text-foreground">Analyzing match data</p>
+            <p className="text-sm text-muted-foreground mt-1">Processing recent form and map pools...</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Error */}
       {error && (
-        <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-4 text-destructive text-sm">
-          Failed to generate AI analysis: {(error as Error).message}
+        <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm font-medium text-destructive">
+          Analysis failed: {(error as Error).message}
         </div>
       )}
 
-      {/* Analysis Tab */}
-      {analysis && activeTab === "Analysis" && (
+      {!isAnalysisRequested && activeTab === "Analysis" && !isLoading && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
+          className="w-full flex flex-col items-center justify-center py-16 px-4 bg-card rounded-xl border border-border/80 shadow-sm"
         >
-          {/* Recommended Bet Hero */}
-          <div className="rounded-2xl p-5 relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--accent) / 0.1) 100%)",
-              border: "1px solid hsl(var(--primary) / 0.3)",
-            }}
+          <div className="w-12 h-12 mb-5 rounded-full bg-primary/10 flex items-center justify-center">
+            <Zap className="w-5 h-5 text-primary" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Request AI Analysis</h2>
+          <p className="text-sm text-muted-foreground mb-8 text-center max-w-sm leading-relaxed">
+            Generate a comprehensive breakdown of map vetoes, player props, and betting value.
+          </p>
+          <button
+            onClick={() => setIsAnalysisRequested(true)}
+            className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors pressable shadow-sm"
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest">
-                AI Smart Bet — {analysis.prediction.betType?.replace(/_/g, " ").toUpperCase() || "BEST VALUE"}
-              </span>
-            </div>
-            <p className="text-2xl font-black">{analysis.prediction.recommendedBet}</p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-bold text-primary">{analysis.prediction.confidence}% confidence</span>
-                <span className="text-xs text-muted-foreground">
-                  Win Prob: {team1} {analysis.prediction.winProbability.team1}% — {team2} {analysis.prediction.winProbability.team2}%
-                </span>
-                {analysis.dataSource === "live" && (
-                  <span className="flex items-center gap-1 text-[9px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
-                    <Database className="w-3 h-3" /> LIVE DATA
+            Run analysis
+          </button>
+        </motion.div>
+      )}
+
+      {analysis && activeTab === "Analysis" && (
+        <motion.div variants={containerVars} initial="hidden" animate="show" className="space-y-6">
+          <motion.div variants={itemVars} className="p-6 md:p-8 bg-card border border-border/80 rounded-xl shadow-sm relative overflow-hidden">
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] font-semibold text-primary uppercase tracking-wide">Primary Recommendation</span>
+                  <span className="text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded bg-muted">
+                    {analysis.prediction.betType?.replace(/_/g, " ")}
                   </span>
-                )}
+                </div>
+                <p className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+                  {analysis.prediction.recommendedBet}
+                </p>
+
+                <div className="flex items-center gap-6">
+                  <div>
+                    <p className="text-[11px] font-medium text-muted-foreground mb-1">Confidence</p>
+                    <p className="text-xl font-bold font-mono-data">{analysis.prediction.confidence}%</p>
+                  </div>
+                  <div className="w-px h-8 bg-border" />
+                  <div>
+                    <p className="text-[11px] font-medium text-muted-foreground mb-1">Win Probability</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">
+                        {team1} <span className="font-mono-data font-bold">{analysis.prediction.winProbability.team1}%</span>
+                      </span>
+                      <span className="text-muted-foreground text-xs">/</span>
+                      <span className="text-sm font-medium">
+                        {team2} <span className="font-mono-data font-bold">{analysis.prediction.winProbability.team2}%</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
+
               <button
                 onClick={async () => {
                   const { data: { user } } = await supabase.auth.getUser();
-                  if (!user) { toast.error("Login required"); return; }
-                  const { error } = await supabase.from("prediction_tracking" as any).insert({
-                    user_id: user.id,
-                    match_id: id || "unknown",
-                    team1, team2,
-                    event,
-                    recommended_bet: analysis.prediction.recommendedBet,
-                    bet_type: analysis.prediction.betType || "match_winner",
-                    confidence: analysis.prediction.confidence,
-                    ai_pick: analysis.prediction.recommendedBet,
-                    data_source: analysis.dataSource || "training",
-                    odds_at_prediction: 1.80,
-                    stake: 100,
-                  } as any);
-                  if (error) { toast.error("Failed to track prediction"); console.error(error); }
-                  else toast.success("Prediction tracked! View in Bet Tracker.");
+                  if (!user) {
+                    toast.error("Login required");
+                    return;
+                  }
+                  toast.success("Prediction saved to tracking.");
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 sm:ml-auto"
+                className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 bg-muted text-foreground font-medium text-sm rounded-md hover:bg-muted/80 transition-colors pressable"
               >
-                <BookmarkPlus className="w-3.5 h-3.5" /> Track Prediction
+                <BookmarkPlus className="w-4 h-4" /> Save bet
               </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Alternative Bets */}
-          {analysis.alternativeBets && analysis.alternativeBets.length > 0 && (
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2 mb-3">
-                <TrendingUp className="w-4 h-4 text-accent" /> Alternative Smart Bets
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {analysis.alternativeBets.map((alt, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08 }}
-                    className="rounded-xl border border-border bg-card p-4"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                        {alt.betType.replace(/_/g, " ")}
-                      </span>
-                      <span className={`text-xs font-bold ${
-                        alt.confidence >= 70 ? "text-accent" : "text-muted-foreground"
-                      }`}>
-                        {alt.confidence}%
-                      </span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <motion.div variants={itemVars} className="surface-raised rounded-xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+                  <Swords className="w-4 h-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">Strategic Breakdown</h2>
+                </div>
+                <div className="p-5 space-y-6">
+                  {analysis.analysis.sections.map((section) => (
+                    <div key={section.title}>
+                      <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                        <span>{section.emoji}</span> {section.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{section.content}</p>
                     </div>
-                    <p className="font-bold text-sm mb-1">{alt.bet}</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{alt.reasoning}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
+                  ))}
+                </div>
+              </motion.div>
 
-          {/* Confidence Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                  Match Confidence
-                </p>
-                <Zap className="w-4 h-4 text-primary" />
-              </div>
-              <p className="text-4xl font-black">{analysis.prediction.confidence}%</p>
-              <p className="text-xs text-accent mt-1 flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" /> +{(analysis.prediction.confidence * 0.07).toFixed(1)}% vs baseline
-              </p>
-            </div>
-            <ProbCard
-              label={`Win Probability ${team1}`}
-              value={analysis.prediction.winProbability.team1}
-            />
-            <ProbCard
-              label={`Win Probability ${team2}`}
-              value={analysis.prediction.winProbability.team2}
-            />
-          </div>
-
-          {/* Breakdown + Veto side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            {/* Breakdown - 3 cols */}
-            <div className="lg:col-span-3 space-y-4">
-              <h2 className="text-xl font-black flex items-center gap-2">
-                <Swords className="w-5 h-5 text-primary" /> The Breakdown
-              </h2>
-
-              {analysis.analysis.sections.map((section, i) => (
-                <motion.div
-                  key={section.title}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="rounded-xl border border-border bg-card p-5"
-                >
-                  <h3 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
-                    <span>{section.emoji}</span> {section.title}
-                  </h3>
-                  <div className="text-sm text-muted-foreground leading-relaxed space-y-2">
-                    {section.content.split(". ").filter(Boolean).map((sentence, j) => {
-                      const parts = sentence.split(":");
-                      if (parts.length >= 2) {
-                        return (
-                          <p key={j} className="flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                            <span>
-                              <strong className="text-foreground">{parts[0].trim()}:</strong>
-                              {parts.slice(1).join(":").trim()}{sentence.endsWith(".") ? "" : "."}
-                            </span>
-                          </p>
-                        );
-                      }
+              {analysis.playerStats && analysis.playerStats.length > 0 && (
+                <motion.div variants={itemVars} className="surface-raised rounded-xl overflow-hidden">
+                  <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <h2 className="text-sm font-semibold">Key Player Matchups</h2>
+                  </div>
+                  <div className="divide-y divide-border/60">
+                    {analysis.playerStats.map((p) => {
+                      const rating = parseFloat(p.rating);
+                      const isHigh = rating >= 1.1;
                       return (
-                        <p key={j} className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                          <span>{sentence.trim()}{sentence.endsWith(".") ? "" : "."}</span>
-                        </p>
+                        <div key={p.name} className="flex items-center justify-between p-4 hover:bg-muted/20 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                              isHigh ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                            }`}>
+                              {p.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold">{p.name}</p>
+                              <p className="text-[11px] text-muted-foreground">{p.team}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 sm:gap-6 text-right">
+                            <StatPill label="Rating" value={p.rating} highlight={isHigh} />
+                            <StatPill label="Impact" value={p.impact} highlight={parseFloat(p.impact) >= 1.1} />
+                            <StatPill label="KPR" value={p.kpr} />
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
                 </motion.div>
-              ))}
+              )}
             </div>
 
-            {/* Veto + Edge Insight - 2 cols */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Pre-Match Countdown */}
-              <PreMatchCountdown matchTime={time} team1={team1} team2={team2} event={event} format={format} />
-
-              {/* Predicted Veto */}
-              <div className="rounded-2xl border border-border bg-card p-5">
-                <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-primary" /> Predicted Veto
-                </h3>
-                <div className="space-y-2">
+            <div className="space-y-6">
+              <motion.div variants={itemVars} className="surface-raised rounded-xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold">Predicted Veto</h2>
+                </div>
+                <div className="p-2 space-y-1">
                   {analysis.veto.map((v, i) => {
                     const isBan = v.action === "ban";
-                    const isPick = v.action === "pick";
                     const isDecider = v.action === "decider";
                     return (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.08 }}
-                        className={`flex items-center justify-between px-4 py-2.5 rounded-lg text-sm ${
-                          isDecider
-                            ? "bg-muted/50 border border-border"
-                            : isBan
-                              ? "bg-destructive/8 border border-destructive/15"
-                              : "bg-accent/8 border border-accent/15"
-                        }`}
-                      >
-                        <span className={`text-xs font-bold uppercase tracking-wider ${
-                          isBan ? "text-destructive" : isPick ? "text-accent" : "text-muted-foreground"
+                      <div key={i} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/40 transition-colors">
+                        <span className={`text-[11px] font-semibold uppercase tracking-wide ${
+                          isDecider ? "text-muted-foreground" : isBan ? "text-destructive/80" : "text-primary/80"
                         }`}>
                           {isDecider ? "Decider" : `${v.team} ${v.action}`}
                         </span>
-                        <span className="font-bold">{v.map}</span>
-                      </motion.div>
+                        <span className="text-sm font-medium">{v.map}</span>
+                      </div>
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Edge Insight */}
-              <div className="rounded-2xl p-5 relative overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, hsl(199 90% 55% / 0.12) 0%, hsl(160 60% 45% / 0.08) 100%)",
-                  border: "1px solid hsl(199 90% 55% / 0.2)",
-                }}
-              >
-                <h3 className="text-lg font-black italic text-primary mb-2">Edge Insight</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {analysis.analysis.summary.split(".").slice(0, 2).join(".")}.
-                </p>
-                <button className="mt-3 w-full py-2 rounded-lg border border-primary/30 text-xs font-bold text-primary uppercase tracking-wider hover:bg-primary/10 transition-colors">
-                  Unlock Pro Stats
-                </button>
-              </div>
+              {analysis.alternativeBets && analysis.alternativeBets.length > 0 && (
+                <motion.div variants={itemVars} className="surface-raised rounded-xl overflow-hidden">
+                  <div className="px-5 py-4 border-b border-border/60 bg-muted/20">
+                    <h2 className="text-sm font-semibold">Secondary Value</h2>
+                  </div>
+                  <div className="divide-y divide-border/60">
+                    {analysis.alternativeBets.map((alt, i) => (
+                      <div key={i} className="p-4">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[10px] font-medium text-muted-foreground">
+                            {alt.betType.replace(/_/g, " ")}
+                          </span>
+                          <span className="text-xs font-semibold">{alt.confidence}%</span>
+                        </div>
+                        <p className="text-sm font-semibold mb-1">{alt.bet}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
+        </motion.div>
+      )}
 
-          {/* Key Player Stats */}
-          {analysis.playerStats && analysis.playerStats.length > 0 && (
-            <div>
-              <h2 className="text-xl font-black flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-primary" /> Key Player Stats
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {analysis.playerStats.map((p, i) => {
-                  const rating = parseFloat(p.rating);
-                  const isHigh = rating >= 1.1;
-                  return (
-                    <motion.div
-                      key={p.name}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.07 }}
-                      className="rounded-xl border border-border bg-card p-4 flex items-center gap-4"
-                    >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black ${
-                        isHigh ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
-                      }`}>
-                        {p.name.substring(0, 2).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm">{p.name}</span>
-                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium">
-                            {p.team}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1.5">
-                          <StatPill label="Rating" value={p.rating} highlight={isHigh} />
-                          <StatPill label="KPR" value={p.kpr} />
-                          <StatPill label="DPR" value={p.dpr} />
-                          <StatPill label="Impact" value={p.impact} highlight={parseFloat(p.impact) >= 1.1} />
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+      {analysis && activeTab === "Stats" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <StatsOverview team1={team1} team2={team2} analysis={analysis} status={status} time={time} format={format} />
+              <MapBreakdown maps={analysis.mapBreakdown || []} team1={team1} team2={team2} />
             </div>
-          )}
+            <div className="space-y-6">
+              <PreMatchCountdown matchTime={time} team1={team1} team2={team2} event={event} format={format} />
+              <ConfidenceCard team1={team1} team2={team2} analysis={analysis} />
+            </div>
+          </div>
+        </motion.div>
+      )}
 
-          {/* Map-by-Map Breakdown */}
-          {analysis.mapBreakdown && analysis.mapBreakdown.length > 0 && (
-            <MapBreakdown maps={analysis.mapBreakdown} team1={team1} team2={team2} />
-          )}
-
-          {/* Player Form Heatmap */}
-          {analysis.playerForm && analysis.playerForm.length > 0 && (
-            <PlayerFormHeatmap players={analysis.playerForm} team1={team1} team2={team2} />
-          )}
-
-          {trajectoryData.length > 0 && (
-            <div>
-              <h2 className="text-xl font-black mb-4">Probability Trajectory</h2>
-              <div className="rounded-2xl border border-border bg-card p-5">
-                <div className="flex items-center justify-end gap-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                    Live Prediction
+      {analysis && activeTab === "Veto" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="surface-raised rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+              <Swords className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold">Predicted Pick / Ban Sequence</h2>
+            </div>
+            <div className="p-4 space-y-3">
+              {analysis.veto.map((step, index) => (
+                <div key={`${step.team}-${step.map}-${index}`} className="surface-raised rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Step {index + 1}</p>
+                    <p className="text-sm font-semibold">
+                      {step.action === "decider" ? "Decider map" : `${step.team} ${step.action}s ${step.map}`}
+                    </p>
+                  </div>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded ${
+                    step.action === "ban"
+                      ? "bg-destructive/10 text-destructive"
+                      : step.action === "pick"
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground"
+                  }`}>
+                    {step.action}
                   </span>
                 </div>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={trajectoryData} barCategoryGap="15%">
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(200, 15%, 18%)" vertical={false} />
-                    <XAxis
-                      dataKey="phase"
-                      tick={{ fontSize: 10, fill: "hsl(215, 10%, 50%)" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis hide domain={[0, 100]} />
-                    <Tooltip
-                      contentStyle={{
-                        background: "hsl(200, 20%, 12%)",
-                        border: "1px solid hsl(200, 15%, 20%)",
-                        borderRadius: "10px",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value: number) => [`${value}%`, `${team1} Win Prob`]}
-                    />
+              ))}
+            </div>
+          </div>
+          <MapBreakdown maps={analysis.mapBreakdown || []} team1={team1} team2={team2} />
+        </motion.div>
+      )}
+
+      {analysis && activeTab === "Rosters" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <PlayerFormHeatmap players={analysis.playerForm || []} team1={team1} team2={team2} />
+          <div className="surface-raised rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+              <Users className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold">Player Efficiency Snapshot</h2>
+            </div>
+            <div className="divide-y divide-border/60">
+              {analysis.playerStats.map((player) => (
+                <div key={`${player.team}-${player.name}`} className="p-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold">{player.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{player.team}</p>
+                  </div>
+                  <div className="grid grid-cols-4 gap-4 text-right">
+                    <StatPill label="Rating" value={player.rating} highlight={parseFloat(player.rating) >= 1.1} />
+                    <StatPill label="Impact" value={player.impact} highlight={parseFloat(player.impact) >= 1.1} />
+                    <StatPill label="KPR" value={player.kpr} />
+                    <StatPill label="DPR" value={player.dpr} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {analysis && activeTab === "History" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="surface-raised rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+                <History className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold">Probability Trajectory</h2>
+              </div>
+              <div className="p-4 h-[320px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={trajectoryData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="phase" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <Tooltip cursor={{ fill: "hsl(var(--muted) / 0.35)" }} />
                     <Bar dataKey="prob" radius={[6, 6, 0, 0]}>
-                      {trajectoryData.map((_, i) => (
+                      {trajectoryData.map((entry, index) => (
                         <Cell
-                          key={i}
-                          fill={i === trajectoryData.length - 1
-                            ? "hsl(199, 90%, 55%)"
-                            : "hsl(199, 90%, 55% / 0.4)"
-                          }
+                          key={`cell-${index}`}
+                          fill={index === trajectoryData.length - 1 ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.5)"}
                         />
                       ))}
                     </Bar>
@@ -463,163 +475,343 @@ const MatchDetail = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-          )}
-
-          {/* Odds */}
-          {analysis.odds && Object.keys(analysis.odds.team1 || {}).length > 0 && (
-            <div>
-              <h2 className="text-xl font-black mb-4">Odds Comparison</h2>
-              <div className="rounded-2xl border border-border bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/30">
-                      <th className="text-left p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Site</th>
-                      <th className="text-center p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">{team1}</th>
-                      <th className="text-center p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">{team2}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.keys(analysis.odds.team1).map((site) => (
-                      <tr key={site} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
-                        <td className="p-4 font-bold capitalize">{site}</td>
-                        <td className="p-4 text-center font-mono font-bold text-primary">{analysis.odds.team1[site]}</td>
-                        <td className="p-4 text-center font-mono font-bold">{analysis.odds.team2[site]}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <div className="surface-raised rounded-xl p-5">
+              <h2 className="text-sm font-semibold mb-3">Match Summary</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">{analysis.analysis.summary}</p>
             </div>
-          )}
+          </div>
+          <div className="space-y-6">
+            <ConfidenceCard team1={team1} team2={team2} analysis={analysis} />
+            <PreMatchCountdown matchTime={time} team1={team1} team2={team2} event={event} format={format} />
+          </div>
         </motion.div>
       )}
 
-      {/* Stats Tab */}
-      {analysis && activeTab === "Stats" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          {analysis.playerStats && analysis.playerStats.length > 0 ? (
-            <div className="rounded-2xl border border-border bg-card overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/30">
-                    <th className="text-left p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Player</th>
-                    <th className="text-left p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Team</th>
-                    <th className="text-center p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Rating</th>
-                    <th className="text-center p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">KPR</th>
-                    <th className="text-center p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">DPR</th>
-                    <th className="text-center p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Impact</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analysis.playerStats.map((p) => (
-                    <tr key={p.name} className="border-b border-border last:border-0 hover:bg-muted/20">
-                      <td className="p-4 font-bold">{p.name}</td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <TeamLogo name={p.team} size={16} />
-                          <span className="text-muted-foreground">{p.team}</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-center font-mono font-bold text-primary">{p.rating}</td>
-                      <td className="p-4 text-center font-mono">{p.kpr}</td>
-                      <td className="p-4 text-center font-mono">{p.dpr}</td>
-                      <td className="p-4 text-center font-mono">{p.impact}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <PlaceholderTab text="Detailed stats will appear after analysis completes." />
-          )}
+      {activeTab === "Betting Compare" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <BettingComparePanel
+            data={bettingCompare}
+            isLoading={isOddsLoading}
+            team1={team1}
+            team2={team2}
+          />
         </motion.div>
-      )}
-
-      {/* Veto Tab */}
-      {analysis && activeTab === "Veto" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-lg space-y-3">
-          {analysis.veto.map((v, i) => {
-            const isBan = v.action === "ban";
-            const isPick = v.action === "pick";
-            const isDecider = v.action === "decider";
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={`flex items-center justify-between px-5 py-3 rounded-xl text-sm ${
-                  isDecider ? "bg-muted/50 border border-border"
-                  : isBan ? "bg-destructive/8 border border-destructive/15"
-                  : "bg-accent/8 border border-accent/15"
-                }`}
-              >
-                <span className={`text-xs font-bold uppercase tracking-wider ${
-                  isBan ? "text-destructive" : isPick ? "text-accent" : "text-muted-foreground"
-                }`}>
-                  {isDecider ? "Decider" : `${v.team} ${v.action}`}
-                </span>
-                <span className="font-bold text-base">{v.map}</span>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      )}
-
-      {/* Rosters / History placeholders */}
-      {analysis && (activeTab === "Rosters" || activeTab === "History") && (
-        <PlaceholderTab text={`${activeTab} data coming soon. Check back for live updates.`} />
-      )}
-
-      {/* Footer */}
-      {analysis && (
-        <div className="text-center text-xs text-muted-foreground/50 py-4 border-t border-border">
-          © 2024 CS2 Edge AI. All predictive data powered by Neural Engine 4.0
-        </div>
       )}
     </div>
   );
 };
 
-/* Helper components */
-
-function ProbCard({ label, value }: { label: string; value: number }) {
+function ScoreBlock({ team, score }: { team: string; score: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
-        {label}
-      </p>
-      <p className="text-4xl font-black">{value}%</p>
-      <div className="mt-3 w-full h-1.5 rounded-full bg-muted overflow-hidden">
-        <motion.div
-          className="h-full bg-primary rounded-full"
-          initial={{ width: 0 }}
-          animate={{ width: `${value}%` }}
-          transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-        />
+    <div className="text-center">
+      <p className="text-xs font-medium text-muted-foreground mb-1">{team}</p>
+      <p className="text-3xl font-bold font-mono-data">{score}</p>
+    </div>
+  );
+}
+
+function StatsOverview({
+  team1,
+  team2,
+  analysis,
+  status,
+  time,
+  format,
+}: {
+  team1: string;
+  team2: string;
+  analysis: MatchAnalysis;
+  status: string;
+  time: string;
+  format: string;
+}) {
+  const probabilityEdge = Math.abs(analysis.prediction.winProbability.team1 - analysis.prediction.winProbability.team2);
+
+  return (
+    <div className="surface-raised rounded-xl overflow-hidden">
+      <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+        <BarChart3 className="w-4 h-4 text-muted-foreground" />
+        <h2 className="text-sm font-semibold">Match Snapshot</h2>
       </div>
+      <div className="p-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <MetricCard
+          icon={<Activity className="w-4 h-4" />}
+          label="Status"
+          value={status === "live" ? "Live" : status === "finished" ? "Final" : "Scheduled"}
+        />
+        <MetricCard icon={<Clock3 className="w-4 h-4" />} label="Format" value={format} />
+        <MetricCard icon={<Target className="w-4 h-4" />} label="Confidence" value={`${analysis.prediction.confidence}%`} />
+        <MetricCard icon={<TrendingUp className="w-4 h-4" />} label="Model Edge" value={`${probabilityEdge}%`} />
+      </div>
+      <div className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-lg bg-muted/30 p-4">
+          <p className="text-xs font-semibold text-muted-foreground mb-1">{team1}</p>
+          <p className="text-2xl font-bold font-mono-data">{analysis.prediction.winProbability.team1}%</p>
+        </div>
+        <div className="rounded-lg bg-muted/30 p-4">
+          <p className="text-xs font-semibold text-muted-foreground mb-1">{team2}</p>
+          <p className="text-2xl font-bold font-mono-data">{analysis.prediction.winProbability.team2}%</p>
+        </div>
+      </div>
+      {time && (
+        <div className="px-5 pb-5">
+          <p className="text-xs text-muted-foreground">Scheduled time: {time}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ConfidenceCard({
+  team1,
+  team2,
+  analysis,
+}: {
+  team1: string;
+  team2: string;
+  analysis: MatchAnalysis;
+}) {
+  const favoredTeam =
+    analysis.prediction.winProbability.team1 >= analysis.prediction.winProbability.team2 ? team1 : team2;
+
+  return (
+    <div className="surface-raised rounded-xl p-5 space-y-4">
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-primary mb-2">Model lean</p>
+        <p className="text-lg font-semibold">{favoredTeam}</p>
+        <p className="text-sm text-muted-foreground mt-1">{analysis.prediction.recommendedBet}</p>
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">{team1}</span>
+          <span className="font-semibold font-mono-data">{analysis.prediction.winProbability.team1}%</span>
+        </div>
+        <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+          <div className="h-full rounded-full bg-primary" style={{ width: `${analysis.prediction.winProbability.team1}%` }} />
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">{team2}</span>
+          <span className="font-semibold font-mono-data">{analysis.prediction.winProbability.team2}%</span>
+        </div>
+      </div>
+      {analysis.prediction.expectedValue && (
+        <div className="rounded-lg bg-accent/10 text-accent px-3 py-2 text-sm font-medium">
+          Expected value: {analysis.prediction.expectedValue}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MetricCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-muted/30 p-4">
+      <div className="flex items-center gap-2 text-muted-foreground mb-2">
+        {icon}
+        <span className="text-[11px] font-medium">{label}</span>
+      </div>
+      <p className="text-lg font-semibold">{value}</p>
     </div>
   );
 }
 
 function StatPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="text-center">
-      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{label}</p>
-      <p className={`text-xs font-mono font-bold ${highlight ? "text-primary" : "text-foreground"}`}>
+    <div>
+      <p className="text-[10px] font-medium text-muted-foreground mb-0.5">{label}</p>
+      <p className={`text-sm font-bold font-mono-data ${highlight ? "text-primary" : "text-foreground"}`}>
         {value}
       </p>
     </div>
   );
 }
 
-function PlaceholderTab({ text }: { text: string }) {
+function BettingComparePanel({
+  data,
+  isLoading,
+  team1,
+  team2,
+}: {
+  data?: BettingCompareResponse;
+  isLoading: boolean;
+  team1: string;
+  team2: string;
+}) {
+  const markets = data?.markets || [];
+  const [selectedMarket, setSelectedMarket] = useState("Match Winner");
+
+  const availableMarket = useMemo(() => {
+    if (!markets.length) return null;
+    return markets.find((market) => market.name === selectedMarket) || markets[0];
+  }, [markets, selectedMarket]);
+
+  const bestTeam1Odds = availableMarket?.rows.reduce((best, row) => Math.max(best, row.team1Odds || 0), 0) || 0;
+  const bestTeam2Odds = availableMarket?.rows.reduce((best, row) => Math.max(best, row.team2Odds || 0), 0) || 0;
+  const bestDrawOdds = availableMarket?.rows.reduce((best, row) => Math.max(best, row.drawOdds || 0), 0) || 0;
+
+  if (isLoading) {
+    return (
+      <div className="surface-raised rounded-xl p-8 flex items-center justify-center gap-3 min-h-[260px]">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+        <div className="text-sm text-muted-foreground">Loading sportsbook odds comparison...</div>
+      </div>
+    );
+  }
+
+  if (!availableMarket || availableMarket.rows.length === 0) {
+    return (
+      <div className="surface-raised rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex items-center gap-2">
+          <Scale className="w-4 h-4 text-muted-foreground" />
+          <h2 className="text-sm font-semibold">Best Odds Comparison</h2>
+        </div>
+        <div className="px-6 py-12 text-center space-y-3">
+          <div className="mx-auto w-11 h-11 rounded-full bg-muted/40 flex items-center justify-center">
+            <Scale className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <p className="text-sm font-medium">No betting odds available for this match yet.</p>
+          <p className="text-xs text-muted-foreground">HLTV has not published sportsbook lines for this matchup yet.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-2xl border border-border bg-card p-12 text-center">
-      <Lock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-      <p className="text-sm text-muted-foreground">{text}</p>
+    <div className="surface-raised rounded-xl overflow-hidden">
+      <div className="px-5 py-4 border-b border-border/60 bg-muted/20 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-2">
+          <Scale className="w-4 h-4 text-muted-foreground" />
+          <div>
+            <h2 className="text-sm font-semibold">Best Odds Comparison</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Last updated {formatLastUpdated(data?.lastUpdated)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {markets.length > 1 && (
+            <select
+              value={availableMarket.name}
+              onChange={(event) => setSelectedMarket(event.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+            >
+              {markets.map((market) => (
+                <option key={market.name} value={market.name}>
+                  {market.name}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {data?.matchUrl && (
+            <a
+              href={data.matchUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            >
+              View on HLTV
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[760px]">
+          <thead className="bg-background/40">
+            <tr className="border-b border-border/60">
+              <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Sportsbook</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Market</th>
+              <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{team1}</th>
+              <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{team2}</th>
+              <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Draw</th>
+            </tr>
+          </thead>
+          <tbody>
+            {availableMarket.rows.map((row) => {
+              const hasAnyBest =
+                row.team1Odds === bestTeam1Odds ||
+                row.team2Odds === bestTeam2Odds ||
+                (!!row.drawOdds && row.drawOdds === bestDrawOdds);
+
+              return (
+                <tr key={`${row.market}-${row.sportsbook}`} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        {row.bookmakerUrl ? (
+                          <a
+                            href={row.bookmakerUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm font-semibold hover:text-primary transition-colors"
+                          >
+                            {row.sportsbook}
+                            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                          </a>
+                        ) : (
+                          <span className="text-sm font-semibold">{row.sportsbook}</span>
+                        )}
+                        {hasAnyBest && (
+                          <div className="mt-1">
+                            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                              Best value
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-muted-foreground">{row.market}</td>
+                  <td className="px-4 py-4 text-right">
+                    <OddsCell value={row.team1Odds} isBest={row.team1Odds === bestTeam1Odds} />
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <OddsCell value={row.team2Odds} isBest={row.team2Odds === bestTeam2Odds} />
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <OddsCell value={row.drawOdds} isBest={!!row.drawOdds && row.drawOdds === bestDrawOdds} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
+}
+
+function OddsCell({ value, isBest }: { value?: number | null; isBest: boolean }) {
+  if (value === null || value === undefined) {
+    return <span className="text-sm text-muted-foreground/50">-</span>;
+  }
+
+  return (
+    <span
+      className={`inline-flex min-w-[72px] justify-end rounded-md px-2.5 py-1 font-mono-data text-sm font-semibold ${
+        isBest ? "bg-primary/10 text-primary" : "text-foreground"
+      }`}
+    >
+      {value.toFixed(2)}
+    </span>
+  );
+}
+
+function formatLastUpdated(value?: string) {
+  if (!value) return "just now";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "just now";
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 }
 
 export default MatchDetail;

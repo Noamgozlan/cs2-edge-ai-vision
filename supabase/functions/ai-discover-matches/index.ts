@@ -18,7 +18,9 @@ serve(async (req) => {
     if (!OPENROUTER_API_KEY) throw new Error("OPENROUTER_API_KEY is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const SUPABASE_SERVICE_KEY =
+      Deno.env.get("SUPABASE_SECRET_KEY") ??
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     const today = new Date().toISOString().slice(0, 10);

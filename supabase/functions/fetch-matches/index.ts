@@ -11,8 +11,10 @@ serve(async (req) => {
 
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_PUBLISHABLE_KEY =
+      Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ??
+      Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     // Get today's date range in UTC
     const now = new Date();
@@ -33,10 +35,23 @@ serve(async (req) => {
     }
 
     let allMatches = dbMatches || [];
+    const freshestUpdate = allMatches.reduce<number>((latest, match: any) => {
+      const timestamp = match?.last_updated_utc ? new Date(match.last_updated_utc).getTime() : 0;
+      return Math.max(latest, Number.isFinite(timestamp) ? timestamp : 0);
+    }, 0);
+    const cacheAgeMs = freshestUpdate > 0 ? Date.now() - freshestUpdate : Number.POSITIVE_INFINITY;
+    const shouldRefreshFromPandaScore =
+      allMatches.length === 0 ||
+      cacheAgeMs > 10 * 60 * 1000 ||
+      allMatches.every((match: any) => Boolean(match?.is_stale));
 
-    // If DB empty, trigger PandaScore sync first, then re-query
-    if (allMatches.length === 0) {
-      console.log("DB empty, triggering PandaScore sync...");
+    // If DB is empty or stale, trigger PandaScore sync and re-query
+    if (shouldRefreshFromPandaScore) {
+      console.log(
+        allMatches.length === 0
+          ? "DB empty, triggering PandaScore sync..."
+          : `Match cache stale (${Math.round(cacheAgeMs / 60000)}m old), triggering PandaScore sync...`
+      );
       try {
         await supabase.functions.invoke("pandascore-matches");
         const { data: refreshed } = await supabase

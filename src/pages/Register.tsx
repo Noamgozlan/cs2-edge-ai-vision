@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, User, Loader2, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useToast } from "@/hooks/use-toast";
+import { getAuthRedirectUrl } from "@/lib/auth";
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@ const Register = () => {
       password,
       options: {
         data: { username },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: getAuthRedirectUrl(),
       },
     });
     setLoading(false);
@@ -53,8 +53,15 @@ const Register = () => {
   };
 
   const handleGoogle = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: getAuthRedirectUrl(),
+        queryParams: {
+          access_type: "offline",
+          prompt: "select_account",
+        },
+      },
     });
     if (error) {
       toast({ title: "Google sign-up failed", description: String(error), variant: "destructive" });
