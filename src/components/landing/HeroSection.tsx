@@ -33,47 +33,9 @@ const AnimatedNumber = ({ value, duration = 1.5, suffix = "" }: { value: number,
   return <span>{count}{suffix}</span>;
 };
 
-const OddsRow = ({ book, initialOdds, isBest, index }: { book: string, initialOdds: string, isBest: boolean, index: number }) => {
-  const [odds, setOdds] = useState(initialOdds);
-  const [flash, setFlash] = useState(false);
-
-  useEffect(() => {
-    // Simulate live odds movement for demo
-    if (book !== "Pinnacle") return;
-    const interval = setInterval(() => {
-      setOdds((prev) => {
-        const val = parseFloat(prev);
-        // Toggle between 1.93 and 1.95
-        return val === 1.93 ? "1.95" : "1.93";
-      });
-      setFlash(true);
-      setTimeout(() => setFlash(false), 800);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [book]);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.8 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className={`flex items-center justify-between rounded-lg px-3 py-2 transition-all duration-500 ${
-        flash 
-          ? "border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_12px_rgba(16,185,129,0.2)]" 
-          : isBest
-            ? "border-[hsl(221,83%,58%)]/20 bg-[hsl(221,83%,58%)]/[0.06]"
-            : "border-white/[0.04] bg-white/[0.02]"
-      }`}
-    >
-      <span className="text-xs font-medium text-white/[0.65]">{book}</span>
-      <span className={`font-mono-data text-sm font-semibold transition-colors duration-300 ${flash ? "text-emerald-400" : "text-white"}`}>
-        {odds}
-      </span>
-    </motion.div>
-  );
-};
-
 // --- Static Data ---
+
+import GlobeBackground from "./GlobeBackground";
 
 const trustPills = [
   "HLTV-backed analysis",
@@ -99,12 +61,21 @@ const fadeUp = {
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden pt-28 sm:pt-32">
-      {/* Subtle background glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[600px] rounded-full bg-[hsl(221,83%,58%)]/[0.06] blur-[100px]" />
+      {/* SellAuth Style hero-bg-img */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden z-0">
+        {/* Core glow */}
+        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] opacity-30 blur-[120px] bg-gradient-to-b from-[hsl(221,83%,58%)] to-transparent rounded-[100%]" />
+        
+        {/* Fine structural grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28 w-full">
+      {/* 3D Globe Background */}
+      <div className="absolute inset-0 z-0">
+        <GlobeBackground />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28 w-full z-10">
         <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
 
           {/* Left: Copy */}
@@ -187,151 +158,102 @@ const HeroSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right: Dashboard Animated Demo */}
+          {/* Right: Mac App Window Demo */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative mx-auto w-full max-w-[36rem]"
+            className="relative mx-auto w-full max-w-[40rem]"
           >
-            <div className="landing-surface-strong rounded-2xl p-4 sm:p-5">
-              
-              {/* Demo Header */}
-              <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-black/20 px-4 py-3">
-                <div>
-                  <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Today's board</p>
-                  <p className="mt-0.5 text-sm font-medium text-white">MOUZ NXT vs CYBERSHOKE</p>
+            {/* App Window Chrome */}
+            <div className="landing-surface-strong rounded-2xl overflow-hidden border border-white/[0.08] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+              {/* Window Header */}
+              <div className="flex items-center justify-between border-b border-white/[0.06] bg-black/40 px-4 py-3">
+                <div className="flex gap-2">
+                  <div className="h-2.5 w-2.5 rounded-full bg-red-500/80 border border-black/20" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/80 border border-black/20" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-green-500/80 border border-black/20" />
                 </div>
-                <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  LIVE
+                <div className="text-[11px] font-mono font-medium text-white/[0.4]">
+                  cs2edge-intelligence-engine
                 </div>
+                <div className="w-10"></div> {/* Spacer for centering */}
               </div>
 
-              <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-                
-                {/* Main Analysis Panel */}
-                <div className="landing-surface rounded-xl p-4 overflow-hidden">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Primary read</p>
-                      <motion.h3 
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="mt-1.5 font-landing-display text-lg text-white"
-                      >
-                        Vitality ML
-                      </motion.h3>
-                    </div>
-                    <motion.div 
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.6, type: "spring" }}
-                      className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-right relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                      <p className="text-[10px] text-white/[0.30]">Confidence</p>
-                      <p className="font-mono-data text-xl font-semibold text-white relative z-10">
-                        <AnimatedNumber value={84} suffix="%" />
-                      </p>
-                    </motion.div>
+              {/* App Content */}
+              <div className="flex h-[380px] bg-[#050508]/80">
+                {/* Sidebar */}
+                <div className="w-14 border-r border-white/[0.06] flex flex-col items-center py-4 gap-6 bg-white/[0.01]">
+                  <div className="w-8 h-8 rounded-lg bg-[hsl(221,83%,58%)]/20 flex items-center justify-center border border-[hsl(221,83%,58%)]/30">
+                    <LineChart className="w-4 h-4 text-[hsl(221,83%,68%)]" />
                   </div>
-
-                  {/* Cards Grid */}
-                  <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                    {[
-                      { icon: ShieldCheck, label: "Map pool", value: "Mirage / Nuke", delay: 0.7 },
-                      { icon: LineChart, label: "Edge", value: "+11.8% EV", delay: 0.8 },
-                      { icon: WalletCards, label: "Best line", value: "1.93 Pinnacle", delay: 0.9 },
-                    ].map(({ icon: Icon, label, value, delay }) => (
-                      <motion.div 
-                        key={label} 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay }}
-                        className="rounded-lg border border-white/[0.06] bg-black/15 p-3 relative group overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="flex items-center gap-1.5 text-white/[0.30]">
-                          <Icon className="h-3.5 w-3.5" />
-                          <span className="text-[10px] font-medium uppercase tracking-wide">{label}</span>
-                        </div>
-                        <p className="mt-2.5 text-[13px] font-medium text-white relative z-10">{value}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Animated Progress Bar */}
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1 }}
-                    className="mt-4 rounded-lg border border-white/[0.06] bg-black/15 p-3"
-                  >
-                    <div className="mb-2 flex items-center justify-between text-[11px] font-medium text-white/[0.40]">
-                      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-                        Vitality <AnimatedNumber value={56} duration={1} suffix="%" />
-                      </motion.span>
-                      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-                        MOUZ NXT <AnimatedNumber value={44} duration={1} suffix="%" />
-                      </motion.span>
-                    </div>
-                    <div className="flex h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                      <motion.div
-                        initial={{ width: "0%" }}
-                        animate={{ width: "56%" }}
-                        transition={{ duration: 1.2, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="h-full rounded-full bg-[hsl(221,83%,58%)] relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-white/20 w-1/2 -translate-x-full animate-[shimmer_2s_infinite_1s]" />
-                      </motion.div>
-                    </div>
-                  </motion.div>
+                  <WalletCards className="w-4 h-4 text-white/[0.3] hover:text-white transition-colors cursor-pointer" />
+                  <ShieldCheck className="w-4 h-4 text-white/[0.3] hover:text-white transition-colors cursor-pointer" />
                 </div>
 
-                {/* Right Column */}
-                <div className="space-y-3">
-                  
-                  {/* Odds Compare Widget */}
-                  <div className="landing-surface rounded-xl p-3.5">
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Odds compare</p>
-                    <div className="mt-3 space-y-2">
-                      {[
-                        { book: "Pinnacle", t1: "1.93", best: true },
-                        { book: "GG.BET", t1: "1.91", best: false },
-                        { book: "Thunderpick", t1: "1.88", best: false },
-                      ].map((row, i) => (
-                        <OddsRow key={row.book} book={row.book} initialOdds={row.t1} isBest={row.best} index={i} />
-                      ))}
-                    </div>
+                {/* Main View */}
+                <div className="flex-1 p-5 overflow-hidden flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white text-sm font-semibold tracking-wide">Live Feed: IEM Cologne</h3>
+                    <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      SYNCING
+                    </span>
                   </div>
 
-                  {/* Player Spotlight Widget */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.2, duration: 0.4 }}
-                    className="landing-surface rounded-xl p-3.5 group relative overflow-hidden cursor-pointer"
-                  >
-                    <div className="absolute inset-0 bg-[hsl(221,83%,58%)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <p className="text-[10px] font-medium uppercase tracking-widest text-white/[0.30]">Player spotlight</p>
-                    <div className="mt-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-[hsl(221,83%,58%)]/20 bg-[hsl(221,83%,58%)]/10 text-xs font-bold text-[hsl(221,83%,68%)] relative overflow-hidden">
-                        Zy
-                        <div className="absolute inset-0 bg-white/10 w-1/2 -translate-x-full group-hover:animate-[shimmer_1s_infinite]" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-[13px] font-medium text-white group-hover:text-[hsl(221,83%,68%)] transition-colors">ZywOo over 19.5</p>
-                          <TrendingUp className="h-3 w-3 text-emerald-400 group-hover:translate-y-[-2px] group-hover:translate-x-[2px] transition-transform" />
+                  <div className="grid gap-3 flex-1">
+                    {/* Main Chart Card */}
+                    <div className="landing-surface rounded-xl p-4 flex flex-col justify-between relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(221,83%,58%)]/0 via-[hsl(221,83%,58%)]/5 to-[hsl(221,83%,58%)]/0 -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
+                      <div className="flex justify-between items-start z-10">
+                        <div>
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Edge Detected</p>
+                          <p className="text-2xl text-white font-mono-data mt-1">+<AnimatedNumber value={12.4} duration={2} suffix="%" /></p>
                         </div>
-                        <p className="mt-0.5 text-[11px] text-white/[0.35]">Role matchup, KPR trend, favorable maps.</p>
+                        <div className="text-right">
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Confidence</p>
+                          <p className="text-lg text-[hsl(221,83%,68%)] font-mono-data"><AnimatedNumber value={84} duration={1.5} suffix="%" /></p>
+                        </div>
+                      </div>
+                      
+                      {/* Fake Chart Line */}
+                      <div className="mt-6 flex items-end gap-1 h-16 w-full z-10 opacity-60">
+                        {[40, 55, 45, 60, 50, 75, 65, 80, 70, 90, 85, 100].map((h, i) => (
+                          <motion.div 
+                            key={i}
+                            initial={{ height: 0 }}
+                            animate={{ height: `${h}%` }}
+                            transition={{ delay: i * 0.05 + 0.5, type: "spring" }}
+                            className={`flex-1 rounded-t-sm ${i > 8 ? "bg-emerald-500" : "bg-[hsl(221,83%,58%)]"}`}
+                          />
+                        ))}
                       </div>
                     </div>
-                  </motion.div>
-                </div>
 
+                    {/* Secondary Data Rows */}
+                    <div className="grid grid-cols-2 gap-3 h-full">
+                      <div className="landing-surface rounded-xl p-3 flex flex-col justify-center">
+                        <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Top Matchup</p>
+                        <p className="text-xs text-white font-medium">Vitality vs MOUZ</p>
+                        <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" /> Vitality ML @ 1.95
+                        </p>
+                      </div>
+                      <div className="landing-surface rounded-xl p-3 flex flex-col justify-center">
+                        <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Prop Alert</p>
+                        <p className="text-xs text-white font-medium">ZywOo over 19.5 Kills</p>
+                        <div className="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: "78%" }}
+                            transition={{ delay: 1.5, duration: 1 }}
+                            className="bg-[hsl(221,83%,58%)] h-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>

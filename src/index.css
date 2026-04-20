@@ -211,66 +211,80 @@
 
   /* ───────────────────────────── Landing design tokens ───────────────────────────── */
 
-  /*
-   * Systematic opacity scale:
-   *   border:  white/[0.06]  (subtle) → white/[0.10] (default) → white/[0.14] (emphasis)
-   *   text:    white/[0.40]  (tertiary) → white/[0.55] (secondary) → white/[0.80] (primary)
-   *   surface: white/[0.03]  (subtle fill) → white/[0.05] (card fill)
-   */
-
   .landing-shell {
-    background:
-      radial-gradient(ellipse 70% 35% at 50% -8%, rgba(77, 124, 255, 0.12), transparent),
-      radial-gradient(ellipse 40% 25% at 80% 5%, rgba(43, 208, 176, 0.06), transparent),
-      #050505;
-    color: #e8ecf4;
+    background: #000000;
+    color: #ffffff;
     min-height: 100vh;
+    position: relative;
+  }
+
+  .landing-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.04;
   }
 
   .landing-surface {
-    background: rgba(255, 255, 255, 0.025);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
 
   .landing-surface-strong {
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
     box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
 
   .landing-primary-button {
-    background: hsl(221 83% 58%);
+    background: linear-gradient(180deg, hsl(221 83% 60%) 0%, hsl(221 83% 53%) 100%);
     color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-    transition: background 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.25),
+      0 2px 8px rgba(77, 124, 255, 0.3);
+    border: 1px solid hsl(221 83% 45%);
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  
   .landing-primary-button:hover {
-    background: hsl(221 83% 62%);
-    box-shadow: 0 2px 8px rgba(77, 124, 255, 0.25);
+    background: linear-gradient(180deg, hsl(221 83% 65%) 0%, hsl(221 83% 56%) 100%);
+    box-shadow: 
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      0 4px 16px rgba(77, 124, 255, 0.4);
+    transform: translateY(-1px);
   }
 
   .landing-outline-button {
-    background: transparent;
-    color: rgba(232, 236, 244, 0.80);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    transition: background 0.15s ease;
+    background: rgba(255, 255, 255, 0.02);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    transition: all 0.2s ease;
   }
+  
   .landing-outline-button:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
   .landing-section-label {
-    color: rgba(77, 124, 255, 0.72);
-    letter-spacing: 0.12em;
-    font-weight: 500;
+    color: hsl(221 83% 68%);
+    letter-spacing: 0.1em;
+    font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
   }
 }
