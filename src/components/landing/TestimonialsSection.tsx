@@ -60,7 +60,7 @@ const TestimonialsSection = () => {
             Trusted by bettors who want signal, not noise.
           </h2>
           <p className="mx-auto mt-5 max-w-[58ch] text-base leading-8 text-white/50">
-            Real feedback from people who use Gozlan BETS as their daily analysis layer.
+            Real feedback from people who use CS2Edge as their daily analysis layer.
           </p>
         </motion.div>
 

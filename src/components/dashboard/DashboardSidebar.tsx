@@ -60,7 +60,7 @@ const DashboardSidebar = () => {
     <aside className="w-[240px] h-screen flex flex-col bg-sidebar border-r border-sidebar-border overflow-hidden">
       <div className="h-[57px] flex items-center px-5 border-b border-sidebar-border flex-shrink-0">
         <Link to="/" className="flex items-center">
-          <img src={gozlanLogo} alt="Gozlan BETS" className="h-8 w-auto object-contain" />
+          <img src={gozlanLogo} alt="CS2Edge" className="h-8 w-auto object-contain" />
         </Link>
       </div>
 

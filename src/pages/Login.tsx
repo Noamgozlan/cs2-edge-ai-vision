@@ -64,8 +64,8 @@ const Login = () => {
       {/* Left panel – branding */}
       <div className="hidden lg:flex lg:flex-col lg:w-[420px] xl:w-[480px] bg-card border-r border-border p-12 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2.5 mb-auto">
-          <div className="w-7 h-7 bg-primary rounded-md flex items-center justify-center text-white text-sm font-bold">G</div>
-          <span className="text-base font-semibold">Gozlan Bets</span>
+          <div className="w-7 h-7 bg-primary rounded-md flex items-center justify-center text-white text-sm font-bold">C</div>
+          <span className="text-base font-semibold">CS2Edge</span>
         </Link>
 
         <div className="mb-auto">
@@ -92,7 +92,7 @@ const Login = () => {
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground/50">© 2025 Gozlan Bets. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground/50">© 2026 CS2Edge. All rights reserved.</p>
       </div>
 
       {/* Right panel – form */}
@@ -100,8 +100,8 @@ const Login = () => {
         {/* Mobile header */}
         <header className="flex items-center justify-between px-6 py-4 border-b border-border lg:hidden">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary rounded flex items-center justify-center text-white text-xs font-bold">G</div>
-            <span className="text-sm font-semibold">Gozlan Bets</span>
+            <div className="w-6 h-6 bg-primary rounded flex items-center justify-center text-white text-xs font-bold">C</div>
+            <span className="text-sm font-semibold">CS2Edge</span>
           </Link>
           <Link to="/register" className="text-sm font-medium text-primary">Create account</Link>
         </header>
