@@ -59,11 +59,11 @@ const DashboardSidebar = () => {
   return (
     <aside className="w-[240px] h-screen flex flex-col bg-sidebar border-r border-sidebar-border overflow-hidden">
       <div className="h-[57px] flex items-center px-5 border-b border-sidebar-border flex-shrink-0">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-[hsl(221,83%,58%)] text-white text-xs font-bold">
+        <Link to="/" className="flex items-center gap-2 pl-1">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[hsl(221,83%,58%)] text-white text-[11px] font-bold shadow-[0_0_12px_rgba(77,124,255,0.4)]">
             C
           </div>
-          <span className="font-landing-display text-sm text-sidebar-foreground">CS2Edge</span>
+          <span className="font-landing-display text-sm font-semibold tracking-tight text-sidebar-foreground">CS2Edge</span>
         </Link>
       </div>
 

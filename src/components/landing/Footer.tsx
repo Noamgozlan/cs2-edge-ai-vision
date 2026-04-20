@@ -5,11 +5,11 @@ const Footer = () => (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[1.5fr_0.75fr_0.75fr_0.75fr]">
         <div className="max-w-xs">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[hsl(221,83%,58%)] text-white text-xs font-bold">
+          <div className="flex items-center gap-2 pl-1">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[hsl(221,83%,58%)] text-white text-[11px] font-bold shadow-[0_0_12px_rgba(77,124,255,0.4)]">
               C
             </div>
-            <span className="font-landing-display text-sm text-white">CS2Edge</span>
+            <span className="font-landing-display text-sm font-semibold tracking-tight text-white">CS2Edge</span>
           </div>
           <p className="mt-5 text-[13px] leading-6 text-white/[0.45]">
             Premium CS2 betting intelligence. Live match context, bookmaker comparison, and AI-driven conviction.
